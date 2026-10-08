@@ -50,26 +50,24 @@ Pada sidebar Administrator, menu dikelompokkan dengan rapi menggunakan sistem **
 
 ---
 
-## 💳 2. Alur Transaksi Kendaraan Keluar (Gate OUT)
+## 💳 2. Alur Transaksi Kendaraan Keluar (Gate OUT - Fast Checkout 1 Halaman)
+
+Tampilan kasir keluar dirancang secara khusus untuk **tampil dalam 1 layar penuh tanpa scroll vertikal**:
 
 1. Buka menu **Kendaraan Keluar** pada sidebar.
 2. Temukan transaksi kendaraan:
-   - **Metode Scan/Cari**: Scan barcode tiket atau ketik **Nomor Tiket / Plat Nomor** pada kotak pencarian, lalu tekan tombol **Cari**.
-   - **Metode Tabel Parkir Aktif**: Klik tombol kuning bertanda kalkulator (**Proses Keluar**) pada baris kendaraan di tabel **Daftar Kendaraan Sedang Parkir**. Tautan ini secara otomatis memuat transaksi berdasarkan nomor tiket (`idtrx`), sehingga bekerja sempurna baik untuk kendaraan dengan plat nomor maupun kendaraan tanpa plat nomor (*Tanpa Nopol*).
-3. Sistem secara otomatis menampilkan rincian kendaraan, waktu masuk, waktu keluar, durasi parkir, dan estimasi biaya:
-   - **Pelengkapan Plat Nomor (Opsional)**: Jika kendaraan masuk tanpa plat nomor, kolom **Nomor Polisi** menyediakan input teks opsional (*Ketik Plat (Opsional)*). Kasir dapat mengisinya untuk melengkapi data/mengecek status member, atau langsung melewatinya dan menekan tombol pembayaran jika ingin mempercepat antrean.
-   - Jika kendaraan terdaftar sebagai **Member Aktif**, status otomatis terdeteksi **GRATIS (Rp 0)**.
-4. Pilih **Pos / Pintu Gate Keluar** (`pos_kasir`).
-5. **Penanganan Kasus Tiket Hilang (*Lost Ticket*)**:
-   - Jika pengunjung kehilangan karcis masuk, centang opsi **Tiket Parkir Hilang (Denda Lost Ticket)**.
-   - Sistem secara otomatis memuat nominal denda kehilangan (`tarif_lost`) dan menambahkannya ke total tagihan.
-   - Masukkan informasi verifikasi: **No. STNK**, **No. KTP**, **Nama Pemilik**, dan **No. Handphone**.
-6. **Pemilihan Metode Pembayaran**:
-   - **Tunai**: Masukkan jumlah nominal uang tunai yang diterima, sistem otomatis menghitung uang kembalian.
-   - **QRIS**: Masukkan Nomor Referensi / RRN transaksi QRIS (uang kembalian Rp 0).
-   - **E-Money / Prepaid**: Masukkan Nomor Approval / Kartu (uang kembalian Rp 0).
-7. Klik tombol **Selesaikan Transaksi & Cetak Struk**.
-8. Sistem mencetak struk thermal tanda bukti pelunasan biaya parkir beserta rincian denda kehilangan dan metode bayar.
+   - **Metode Scan/Cari (Utama)**: Scan barcode karcis atau ketik Nomor Tiket / Plat Nomor pada Scanner Bar di bagian atas, lalu tekan **Enter**.
+   - **Metode Tab Kendaraan Parkir**: Klik tab **Kendaraan Sedang Parkir**, lalu klik tombol kuning (**Proses Keluar**) pada baris kendaraan yang diinginkan.
+3. Sistem langsung menampilkan form checkout **2-Panel Sejajar (1 Halaman Penuh)**:
+   - **Panel Kiri**: Rincian nomor tiket, plat nomor (opsional jika kosong), jenis kendaraan, gate masuk, waktu masuk, waktu keluar, dan durasi parkir.
+   - **Panel Kanan**: Pilihan gate keluar, nominal **Total Tagihan Parkir** berukuran besar, dan badge status `[UANG PAS (OTOMATIS)]`.
+4. **Fast Checkout (1 Detik)**:
+   - Kursor otomatis langsung mengarah ke tombol **SELESAIKAN & CETAK STRUK [↵ ENTER]**.
+   - Kasir cukup menekan tombol **Enter** pada keyboard (atau 1 kali klik mouse) untuk langsung menyelesaikan transaksi dan mencetak struk!
+5. **Opsi Tambahan (Jika Diperlukan Saja)**:
+   - **Karcis Hilang (+Denda)**: Centang switch karcis hilang untuk memuat denda kehilangan dan mengisi data verifikasi identitas (STNK/KTP).
+   - **Opsi Lanjutan / Kembalian**: Klik tombol opsi lanjutan untuk memilih metode non-tunai (QRIS/E-Money) atau menghitung kembalian uang pecahan lebih.
+6. Sistem mencetak struk thermal tanda bukti pelunasan biaya parkir.
 
 ---
 

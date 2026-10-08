@@ -4,6 +4,48 @@ Seluruh riwayat penambahan fitur, perubahan skema penanganan data, dan modifikas
 
 ---
 
+## 🚀 Versi 2.2.0 (Penyederhanaan Tampilan Kasir Keluar 1 Halaman & Fast Checkout) - 2026-10-08
+
+### 📌 Ringkasan Pembaruan
+Pembaruan ini melakukan refactoring dan penyederhanaan antarmuka pengguna (UI/UX) pada halaman **Kendaraan Keluar** (`/parkir/keluar`). Seluruh proses pembayaran, rincian kendaraan, total tagihan, dan tombol aksi **"Selesaikan Transaksi & Cetak Struk"** kini tampil kompak dalam **1 halaman (tanpa perlu scroll vertikal)** serta mendukung penyelesaian transaksi instan (*one-key fast checkout* via tombol Enter).
+
+---
+
+### 🎨 Desain Antarmuka Baru (Layout POS 1 Halaman)
+
+#### 1. Sistem Tab Terpisah (Kasir vs Antrean Parkir)
+- **Tab 1: Kasir / Checkout Keluar**: Fokus utama operasional kasir harian.
+- **Tab 2: Kendaraan Sedang Parkir**: Tabel lengkap kendaraan terparkir dengan badge jumlah kendaraan aktif (`count($active_list)`). Memilih tombol *Proses Keluar* pada tabel akan otomatis memuat transaksi ke Tab 1.
+
+#### 2. Scanner Bar Ramping (*Inline Horizontal Bar*)
+- Kotak scan barcode tiket/karcis diubah menjadi satu baris horizontal kompak di bagian atas.
+- Otomatis memfokuskan kursor (`autofocus`) pada kolom input jika belum ada transaksi yang sedang diproses.
+
+#### 3. Form Checkout 2-Panel Sejajar (*Split Grid 50/50*)
+Saat tiket discan atau ditemukan:
+- **Panel Kiri (Data Tiket & Kendaraan)**:
+  - Menampilkan ringkasan ringkas: Nomor Tiket, Plat Nopol (dengan input opsional jika kosong), Jenis Kendaraan, Gate Masuk, Jam Masuk, Jam Keluar, dan Durasi Parkir.
+  - Opsi *Tiket Hilang (+Denda)* dan tombol *Void* dikemas dalam toggle/collapse ringkas.
+- **Panel Kanan (Kasir Pembayaran Super Cepat)**:
+  - Header memuat pilihan Gate Keluar secara inline.
+  - Display box gelap kontras tinggi dengan nominal **Total Tagihan Parkir** berukuran besar.
+  - Badge status: `[✓ UANG PAS (OTOMATIS)]`.
+  - Input nominal bayar otomatis diisi pas (`bayar = totalTagihan`) secara transparan di latar belakang, melewati proses ketik manual kasir.
+  - Tersedia opsi *Opsi Lanjutan / Kembalian* jika kasir ingin memilih QRIS/E-Money atau menghitung kembalian uang pecahan lebih.
+  - **Tombol Utama "SELESAIKAN & CETAK STRUK"**: Berukuran besar dengan badge `↵ ENTER`, warna kuning menyala, dan otomatis aktif (`autofocus`).
+
+#### 4. Fast Checkout via Keyboard (One-Key Enter)
+- Setelah kasir men-scan tiket barcode, kasir cukup menekan tombol **[Enter]** pada keyboard (atau 1 kali klik mouse), sistem langsung memproses pelunasan dan mencetak struk thermal ke printer kasir dalam hitungan detik.
+
+---
+
+### 📂 Berkas yang Dimodifikasi
+- [`app/views/parkir/keluar.php`](file:///d:/Data/dev/web/aplikasi-parkir/app/views/parkir/keluar.php)
+- [`docs/CHANGELOG.md`](file:///d:/Data/dev/web/aplikasi-parkir/docs/CHANGELOG.md)
+- [`docs/USER_GUIDE.md`](file:///d:/Data/dev/web/aplikasi-parkir/docs/USER_GUIDE.md)
+
+---
+
 ## 🚀 Versi 2.1.1 (Perbaikan Tombol Proses Keluar & Penanganan Kendaraan Tanpa Nopol) - 2026-10-08
 
 ### 📌 Ringkasan Masalah & Pembaruan

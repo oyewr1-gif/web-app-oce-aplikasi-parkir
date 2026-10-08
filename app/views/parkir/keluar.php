@@ -1,190 +1,240 @@
 <?php require_once '../app/views/layouts/header.php'; ?>
 
-<div class="row g-4">
-    <!-- Lookup & Billing Form Column -->
-    <div class="col-12 col-lg-6">
-        <div class="card card-custom mb-4">
-            <div class="card-header bg-warning text-dark py-3">
-                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-magnifying-glass me-2"></i> Cari Tiket / Plat Nomor</h5>
-            </div>
-            <div class="card-body p-4">
-                <form action="<?= BASE_URL ?>/parkir/keluar" method="GET">
-                    <div class="mb-3">
-                        <label for="keyword" class="form-label fw-bold">Nomor Tiket atau Plat Nomor</label>
-                        <div class="input-group input-group-lg">
-                            <input type="text" class="form-control auto-focus text-uppercase fw-bold" id="keyword" name="keyword" value="<?= htmlspecialchars($keyword ?? '') ?>" placeholder="Scan Tiket / Plat..." required autocomplete="off">
-                            <button class="btn btn-warning fw-bold" type="submit">Cari</button>
+<!-- Top Tab Navigation: Kasir vs Antrean -->
+<ul class="nav nav-pills mb-3 border-bottom pb-2" id="parkirTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold <?= ($trx && $calc) || empty($_GET['tab']) || $_GET['tab'] !== 'antrean' ? 'active' : '' ?>" id="kasir-tab" data-bs-toggle="pill" data-bs-target="#tab-kasir" type="button" role="tab">
+            <i class="fa-solid fa-cash-register me-1"></i> Kasir / Checkout Keluar
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold <?= isset($_GET['tab']) && $_GET['tab'] === 'antrean' ? 'active' : '' ?>" id="antrean-tab" data-bs-toggle="pill" data-bs-target="#tab-antrean" type="button" role="tab">
+            <i class="fa-solid fa-car me-1"></i> Kendaraan Sedang Parkir 
+            <span class="badge bg-secondary ms-1"><?= count($active_list) ?></span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="parkirTabContent">
+    <!-- TAB 1: KASIR CHECKOUT KELUAR -->
+    <div class="tab-pane fade <?= ($trx && $calc) || empty($_GET['tab']) || $_GET['tab'] !== 'antrean' ? 'show active' : '' ?>" id="tab-kasir" role="tabpanel">
+        
+        <!-- Scanner Bar Ramping (1 Baris Horizontal) -->
+        <div class="card card-custom mb-3 bg-light border-0 shadow-sm">
+            <div class="card-body p-2 p-md-3">
+                <form action="<?= BASE_URL ?>/parkir/keluar" method="GET" class="row g-2 align-items-center">
+                    <div class="col-auto d-none d-md-block">
+                        <span class="fw-bold text-dark"><i class="fa-solid fa-barcode fs-5 me-1 text-warning"></i> Scan / Cari:</span>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                            <input type="text" class="form-control text-uppercase fw-bold border-start-0" id="keyword" name="keyword" value="<?= htmlspecialchars($keyword ?? '') ?>" placeholder="Scan barcode karcis / ketik nopol / nomor tiket..." autocomplete="off" <?= !($trx && $calc) ? 'autofocus' : '' ?>>
+                            <button class="btn btn-warning px-4 fw-bold" type="submit">Cari (Enter)</button>
                         </div>
                     </div>
+                    <?php if ($trx && $calc): ?>
+                        <div class="col-auto">
+                            <a href="<?= BASE_URL ?>/parkir/keluar" class="btn btn-outline-secondary fw-semibold" title="Reset / Transaksi Baru">
+                                <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                            </a>
+                        </div>
+                    <?php endif; ?>
                 </form>
             </div>
         </div>
 
         <?php Session::flash(); ?>
 
-        <!-- Billing Calculation Result Card -->
         <?php if ($trx && $calc): ?>
-            <div class="card card-custom border-warning shadow-sm">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-calculator me-1"></i> Rincian Biaya & Pembayaran</h6>
-                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalVoid<?= $trx['id'] ?>">
-                        <i class="fa-solid fa-ban me-1"></i> Batalkan (Void)
-                    </button>
-                </div>
-                <div class="card-body p-4">
-                    <form action="<?= BASE_URL ?>/parkir/prosesKeluar" method="POST" id="formCheckout">
-                        <input type="hidden" name="idtrx" value="<?= htmlspecialchars($trx['idtrx']) ?>">
-                        <input type="hidden" id="baseTarif" value="<?= $calc['tarif'] ?>">
+            <!-- FORM CHECKOUT 1 HALAMAN: 2 PANEL SEJAJAR -->
+            <form action="<?= BASE_URL ?>/parkir/prosesKeluar" method="POST" id="formCheckout">
+                <input type="hidden" name="idtrx" value="<?= htmlspecialchars($trx['idtrx']) ?>">
+                <input type="hidden" id="baseTarif" value="<?= $calc['tarif'] ?>">
+                <input type="hidden" name="bayar" id="inputBayar" value="<?= $calc['tarif'] ?>">
 
-                        <div class="table-responsive mb-3">
-                            <table class="table table-sm table-borderless">
-                                <tr>
-                                    <td class="text-muted" width="40%">Kode Tiket</td>
-                                    <td class="fw-bold text-end font-monospace"><?= htmlspecialchars($trx['idtrx']) ?></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted align-middle">Nomor Polisi</td>
-                                    <td class="text-end">
-                                        <?php if (!empty($trx['nopol'])): ?>
-                                            <span class="fw-bold text-primary fs-5"><?= htmlspecialchars($trx['nopol']) ?></span>
-                                            <input type="hidden" name="nopol_update" value="<?= htmlspecialchars($trx['nopol']) ?>">
-                                        <?php else: ?>
-                                            <div class="input-group input-group-sm justify-content-end" style="max-width: 220px; float: right;">
-                                                <input type="text" name="nopol_update" class="form-control text-uppercase fw-bold text-end border-secondary" placeholder="Ketik Plat (Opsional)" autocomplete="off">
-                                            </div>
-                                            <div class="clearfix"></div>
-                                            <small class="text-muted d-block mt-1"><i class="fa-solid fa-circle-info me-1"></i>Plat kosong saat masuk (opsional / boleh dilewati).</small>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted">Jenis Kendaraan</td>
-                                    <td class="fw-bold text-end"><?= htmlspecialchars($trx['jn_kendaraan']) ?></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted">Gate Masuk</td>
-                                    <td class="fw-bold text-end text-success"><?= htmlspecialchars($trx['gate'] ?? 'MAN R4') ?></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted">Waktu Masuk</td>
-                                    <td class="text-end"><?= htmlspecialchars($trx['waktuMasuk']) ?></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted">Waktu Keluar</td>
-                                    <td class="text-end"><?= htmlspecialchars($calc['waktu_keluar']) ?></td>
-                                </tr>
-                                <tr class="table-light border-top">
-                                    <td class="fw-bold">Durasi Parkir</td>
-                                    <td class="fw-bold text-end text-dark"><?= htmlspecialchars($calc['durasi_str']) ?> (<?= $calc['durasi_jam'] ?> Jam)</td>
-                                </tr>
-                                <?php if (isset($calc['is_member']) && $calc['is_member']): ?>
-                                    <tr class="table-info">
-                                        <td colspan="2" class="text-center text-info fw-bold py-2">
-                                            <i class="fa-solid fa-circle-check me-1"></i> Status: Member Parkir Langganan (GRATIS)
-                                        </td>
-                                    </tr>
-                                <?php endif; ?>
-                            </table>
-                        </div>
-
-                        <!-- Gate Keluar Selection -->
-                        <div class="mb-3">
-                            <label for="gateout" class="form-label fw-bold small text-secondary">Pos / Pintu Gate Keluar</label>
-                            <select class="form-select" id="gateout" name="gateout" required>
-                                <?php foreach ($pos_list as $pos): ?>
-                                    <option value="<?= htmlspecialchars($pos['nama']) ?>" <?= ($trx['gateout'] ?? '') == $pos['nama'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($pos['nama']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- Tiket Hilang & Denda (Lost Ticket) Section -->
-                        <div class="card bg-light border-danger mb-3">
+                <div class="row g-3 align-items-stretch">
+                    <!-- PANEL KIRI: Data Tiket & Kendaraan -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card card-custom h-100 shadow-sm border-0">
+                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-primary small"><i class="fa-solid fa-receipt me-1"></i> Data Tiket & Kendaraan</span>
+                                <button type="button" class="btn btn-xs btn-outline-danger py-0 px-2" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalVoid<?= $trx['id'] ?>">
+                                    <i class="fa-solid fa-ban me-1"></i> Void
+                                </button>
+                            </div>
                             <div class="card-body p-3">
-                                <div class="form-check form-switch mb-2">
-                                    <input class="form-check-input" type="checkbox" id="checkLost" name="is_lost" value="1">
-                                    <label class="form-check-label fw-bold text-danger" for="checkLost">
-                                        <i class="fa-solid fa-triangle-exclamation me-1"></i> Tiket Parkir Hilang (Denda Lost Ticket)
-                                    </label>
+                                <table class="table table-sm table-borderless mb-2">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-muted small py-1" width="35%">No. Tiket</td>
+                                            <td class="fw-bold font-monospace text-dark py-1 text-end"><?= htmlspecialchars($trx['idtrx']) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted small py-1 align-middle">Nomor Polisi</td>
+                                            <td class="py-1 text-end">
+                                                <?php if (!empty($trx['nopol'])): ?>
+                                                    <span class="fw-bold text-primary fs-5"><?= htmlspecialchars($trx['nopol']) ?></span>
+                                                    <input type="hidden" name="nopol_update" value="<?= htmlspecialchars($trx['nopol']) ?>">
+                                                <?php else: ?>
+                                                    <input type="text" name="nopol_update" class="form-control form-control-sm text-uppercase fw-bold text-end d-inline-block border-secondary" style="max-width: 180px;" placeholder="Ketik Plat (Opsional)" autocomplete="off">
+                                                    <div class="small text-muted" style="font-size: 0.75rem;">Plat kosong saat masuk (opsional)</div>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted small py-1">Jenis Kendaraan</td>
+                                            <td class="fw-semibold py-1 text-end"><?= htmlspecialchars($trx['jn_kendaraan']) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted small py-1">Gate Masuk</td>
+                                            <td class="py-1 text-end text-success fw-semibold small"><?= htmlspecialchars($trx['gate'] ?? 'MAN R4') ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted small py-1">Waktu Masuk</td>
+                                            <td class="py-1 text-end small"><?= htmlspecialchars($trx['waktuMasuk']) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted small py-1">Waktu Keluar</td>
+                                            <td class="py-1 text-end small"><?= htmlspecialchars($calc['waktu_keluar']) ?></td>
+                                        </tr>
+                                        <tr class="table-light border-top">
+                                            <td class="fw-bold py-1">Durasi Parkir</td>
+                                            <td class="fw-bold py-1 text-end text-dark"><?= htmlspecialchars($calc['durasi_str']) ?> (<?= $calc['durasi_jam'] ?> Jam)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <?php if (isset($calc['is_member']) && $calc['is_member']): ?>
+                                    <div class="alert alert-info py-1 px-2 mb-2 small text-center fw-bold">
+                                        <i class="fa-solid fa-circle-check me-1"></i> Member Parkir Aktif (GRATIS)
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Tiket Hilang & Denda (Collapsible Ringkas) -->
+                                <div class="mt-2 pt-2 border-top">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input" type="checkbox" id="checkLost" name="is_lost" value="1">
+                                            <label class="form-check-label small fw-bold text-danger" for="checkLost">
+                                                Karcis Hilang (+Denda)
+                                            </label>
+                                        </div>
+                                        <span class="small text-muted" id="lostBadgeInfo">+Rp <?= number_format($calc['denda_lost_default'] ?? 10000) ?></span>
+                                    </div>
+                                    <div id="lostTicketDetails" style="display: none;" class="mt-2 p-2 bg-light rounded border">
+                                        <div class="row g-2 mb-1">
+                                            <div class="col-6">
+                                                <label class="form-label small text-muted mb-0" style="font-size: 0.75rem;">Nominal Denda (Rp)</label>
+                                                <input type="number" class="form-control form-control-sm" id="inputDenda" name="denda" value="<?= $calc['denda_lost_default'] ?? 10000 ?>">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small text-muted mb-0" style="font-size: 0.75rem;">No. STNK</label>
+                                                <input type="text" class="form-control form-control-sm" name="nostnk" placeholder="No. STNK">
+                                            </div>
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <label class="form-label small text-muted mb-0" style="font-size: 0.75rem;">Nama Pemilik</label>
+                                                <input type="text" class="form-control form-control-sm" name="nama_pemilik" placeholder="Nama Pemilik">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small text-muted mb-0" style="font-size: 0.75rem;">No. HP / KTP</label>
+                                                <input type="text" class="form-control form-control-sm" name="nohp" placeholder="No HP/KTP">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div id="lostTicketDetails" style="display: none;" class="mt-2 pt-2 border-top">
-                                    <div class="mb-2">
-                                        <label class="form-label small fw-bold">Nominal Denda Hilang (Rp)</label>
-                                        <input type="number" class="form-control form-control-sm" id="inputDenda" name="denda" value="<?= $calc['denda_lost_default'] ?? 10000 ?>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL KANAN: Kasir Pembayaran & Tombol Eksekusi Cepat -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card card-custom h-100 shadow-sm border-warning d-flex flex-column justify-content-between">
+                            <div class="card-header bg-warning text-dark py-2 d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="fa-solid fa-coins me-1"></i> Kasir Pembayaran</span>
+                                <!-- Gate Keluar Selection dibuat ringkas di header -->
+                                <div class="d-flex align-items-center">
+                                    <span class="small me-1 text-dark-50 fw-bold">Gate:</span>
+                                    <select class="form-select form-select-sm py-0 ps-2 pe-4 fw-bold" id="gateout" name="gateout" style="max-width: 140px; font-size: 0.8rem;">
+                                        <?php foreach ($pos_list as $pos): ?>
+                                            <option value="<?= htmlspecialchars($pos['nama']) ?>" <?= ($trx['gateout'] ?? '') == $pos['nama'] ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($pos['nama']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <!-- TOTAL TAGIHAN DISPLAY BESAR -->
+                                <div class="bg-dark text-white p-3 rounded mb-3 text-center shadow-sm">
+                                    <div class="text-white-50 small fw-bold text-uppercase" style="letter-spacing: 1px;">TOTAL TAGIHAN PARKIR</div>
+                                    <div class="display-5 fw-bold text-warning my-1" id="displayTotalTagihan">Rp <?= number_format($calc['tarif']) ?></div>
+                                    <div class="badge bg-success px-3 py-1 font-monospace" id="badgeStatusBayar">
+                                        <i class="fa-solid fa-check me-1"></i> UANG PAS (OTOMATIS)
                                     </div>
-                                    <div class="row g-2 mb-2">
-                                        <div class="col-6">
-                                            <label class="form-label small text-muted">No. STNK</label>
-                                            <input type="text" class="form-control form-control-sm" name="nostnk" placeholder="Nomor STNK">
+                                </div>
+
+                                <!-- METODE BAYAR & HITUNG KEMBALIAN (OPSIONAL) -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small fw-bold text-secondary">Metode Bayar:</span>
+                                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none small" id="toggleOpsiBayar">
+                                            <i class="fa-solid fa-sliders me-1"></i> Opsi Lanjutan / Kembalian
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="btn-group w-100 btn-group-sm" role="group">
+                                        <input type="radio" class="btn-check" name="cara_bayar" id="payTunai" value="Tunai" checked>
+                                        <label class="btn btn-outline-primary fw-bold" for="payTunai"><i class="fa-solid fa-money-bill-wave me-1"></i> Tunai</label>
+
+                                        <input type="radio" class="btn-check" name="cara_bayar" id="payQris" value="QRIS">
+                                        <label class="btn btn-outline-info fw-bold" for="payQris"><i class="fa-solid fa-qrcode me-1"></i> QRIS</label>
+
+                                        <input type="radio" class="btn-check" name="cara_bayar" id="payPrepaid" value="Prepaid">
+                                        <label class="btn btn-outline-secondary fw-bold" for="payPrepaid"><i class="fa-solid fa-credit-card me-1"></i> E-Money</label>
+                                    </div>
+
+                                    <!-- Panel Detail Bayar Manual (Default Hidden) -->
+                                    <div id="panelManualBayar" style="display: none;" class="mt-2 p-2 bg-light rounded border">
+                                        <div id="boxRefBayar" style="display: none;" class="mb-2">
+                                            <label class="form-label small fw-bold mb-1" style="font-size: 0.75rem;">No. Referensi / Trace ID</label>
+                                            <input type="text" class="form-control form-control-sm" name="refbayar" placeholder="Nomor Reff Transaksi">
                                         </div>
-                                        <div class="col-6">
-                                            <label class="form-label small text-muted">No. KTP</label>
-                                            <input type="text" class="form-control form-control-sm" name="noktp" placeholder="Nomor KTP">
+
+                                        <div id="boxManualTunai">
+                                            <div class="row g-2 align-items-center">
+                                                <div class="col-6">
+                                                    <label class="form-label small fw-bold mb-0" style="font-size: 0.75rem;">Uang Diterima (Rp)</label>
+                                                    <input type="number" class="form-control form-control-sm fw-bold text-end" id="inputBayarManual" value="<?= $calc['tarif'] ?>" min="<?= $calc['tarif'] ?>" step="500">
+                                                </div>
+                                                <div class="col-6">
+                                                    <label class="form-label small text-muted mb-0" style="font-size: 0.75rem;">Kembalian</label>
+                                                    <div id="displayKembalian" class="fw-bold text-success fs-6 text-end pt-1">Rp 0</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <label class="form-label small text-muted">Nama Pemilik</label>
-                                            <input type="text" class="form-control form-control-sm" name="nama_pemilik" placeholder="Nama sesuai identitas">
-                                        </div>
-                                        <div class="col-6">
-                                            <label class="form-label small text-muted">No. Handphone</label>
-                                            <input type="text" class="form-control form-control-sm" name="nohp" placeholder="08xxxxxxxxxx">
-                                        </div>
+                                </div>
+
+                                <!-- TOMBOL UTAMA SUPER CEPAT (FOKUS UTAMA) -->
+                                <div>
+                                    <button type="submit" id="btnProsesKeluar" class="btn btn-warning btn-lg w-100 fw-bold py-3 shadow text-dark fs-5 border border-2 border-dark" autofocus>
+                                        <i class="fa-solid fa-print me-2"></i> SELESAIKAN & CETAK STRUK <span class="badge bg-dark text-warning ms-2 small fs-6 font-monospace">↵ ENTER</span>
+                                    </button>
+                                    <div class="text-center mt-2 small text-muted" style="font-size: 0.8rem;">
+                                        <i class="fa-solid fa-keyboard me-1"></i> Tekan tombol <strong>[Enter]</strong> pada keyboard untuk langsung checkout
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- TOTAL BILLING DISPLAY -->
-                        <div class="bg-light p-3 rounded mb-3 text-center border">
-                            <span class="text-muted small d-block">TOTAL YANG HARUS DIBAYAR</span>
-                            <h2 class="fw-bold text-danger mb-0" id="displayTotalTagihan">Rp <?= number_format($calc['tarif']) ?></h2>
-                        </div>
-
-                        <!-- METODE PEMBAYARAN -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-secondary">Metode Pembayaran</label>
-                            <div class="btn-group w-100" role="group">
-                                <input type="radio" class="btn-check" name="cara_bayar" id="payTunai" value="Tunai" checked>
-                                <label class="btn btn-outline-primary" for="payTunai"><i class="fa-solid fa-money-bill-wave me-1"></i> Tunai</label>
-
-                                <input type="radio" class="btn-check" name="cara_bayar" id="payQris" value="QRIS">
-                                <label class="btn btn-outline-info" for="payQris"><i class="fa-solid fa-qrcode me-1"></i> QRIS</label>
-
-                                <input type="radio" class="btn-check" name="cara_bayar" id="payPrepaid" value="Prepaid">
-                                <label class="btn btn-outline-secondary" for="payPrepaid"><i class="fa-solid fa-credit-card me-1"></i> E-Money</label>
-                            </div>
-                        </div>
-
-                        <!-- Non-Tunai Ref Field -->
-                        <div class="mb-3" id="boxRefBayar" style="display: none;">
-                            <label class="form-label fw-bold small text-secondary">No. Referensi / Approval Transaksi</label>
-                            <input type="text" class="form-control" name="refbayar" placeholder="Nomor Reff / Trace ID transaksi">
-                        </div>
-
-                        <!-- Tunai Fields -->
-                        <div id="boxTunai">
-                            <div class="mb-3">
-                                <label for="inputBayar" class="form-label fw-bold">Nominal Uang Bayar (Rp)</label>
-                                <input type="number" class="form-control form-control-lg fw-bold text-end" id="inputBayar" name="bayar" value="<?= $calc['tarif'] ?>" min="<?= $calc['tarif'] ?>" step="500" required>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-4 p-2 bg-white rounded border">
-                                <span class="fw-bold text-secondary">Kembalian:</span>
-                                <span id="displayKembalian" class="fw-bold text-success fs-5">Rp 0</span>
-                            </div>
-                        </div>
-
-                        <button type="submit" id="btnProsesKeluar" class="btn btn-warning btn-lg w-100 fw-bold text-dark">
-                            <i class="fa-solid fa-check-circle me-1"></i> Selesaikan Transaksi & Cetak Struk
-                        </button>
-                    </form>
+                    </div>
                 </div>
-            </div>
+            </form>
 
-            <!-- Modal Void Transaksi -->
+            <!-- Modal Void Transaksi Aktif -->
             <div class="modal fade" id="modalVoid<?= $trx['id'] ?>" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -214,24 +264,47 @@
                     </div>
                 </div>
             </div>
+
+        <?php else: ?>
+            <!-- TAMPILAN AWAL (BELUM ADA TIKET DI-SCAN) -->
+            <div class="card card-custom text-center py-5 border-0 shadow-sm bg-white">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="d-inline-flex p-3 rounded-circle bg-warning bg-opacity-10 text-warning">
+                            <i class="fa-solid fa-barcode fs-1"></i>
+                        </span>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-1">Siap Memproses Kendaraan Keluar</h4>
+                    <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
+                        Scan barcode karcis parkir atau ketik nomor plat/tiket pada kolom pencarian di atas, lalu tekan <strong class="text-dark">Enter</strong>.
+                    </p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('antrean-tab').click();">
+                            <i class="fa-solid fa-car me-1"></i> Pilih Dari Kendaraan Sedang Parkir (<?= count($active_list) ?>)
+                        </button>
+                    </div>
+                </div>
+            </div>
         <?php endif; ?>
+
     </div>
 
-    <!-- Active Parked Vehicles List Column -->
-    <div class="col-12 col-lg-6">
-        <div class="card card-custom">
-            <div class="card-header d-flex justify-content-between align-items-center">
+    <!-- TAB 2: DAFTAR KENDARAAN SEDANG PARKIR -->
+    <div class="tab-pane fade <?= isset($_GET['tab']) && $_GET['tab'] === 'antrean' ? 'show active' : '' ?>" id="tab-antrean" role="tabpanel">
+        <div class="card card-custom shadow-sm border-0">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
                 <span class="fw-bold"><i class="fa-solid fa-list me-1"></i> Daftar Kendaraan Sedang Parkir</span>
-                <span class="badge bg-secondary"><?= count($active_list) ?> Terparkir</span>
+                <span class="badge bg-primary fs-6"><?= count($active_list) ?> Kendaraan Aktif</span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive" style="max-height: 600px;">
+                <div class="table-responsive" style="max-height: 550px;">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light sticky-top">
                             <tr>
                                 <th>No. Tiket</th>
                                 <th>Nopol</th>
-                                <th>Jenis</th>
+                                <th>Jenis Kendaraan</th>
+                                <th>Gate Masuk</th>
                                 <th>Waktu Masuk</th>
                                 <th class="text-end">Aksi</th>
                             </tr>
@@ -239,7 +312,7 @@
                         <tbody>
                             <?php if (empty($active_list)): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center py-5 text-muted">
+                                    <td colspan="6" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-circle-check fs-2 text-success d-block mb-2"></i>
                                         Tidak ada kendaraan yang sedang parkir saat ini.
                                     </td>
@@ -256,11 +329,12 @@
                                             <?php endif; ?>
                                         </td>
                                         <td><?= htmlspecialchars($row['jn_kendaraan']) ?></td>
+                                        <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($row['gate'] ?? 'POS-IN-01') ?></span></td>
                                         <td class="small text-muted"><?= htmlspecialchars($row['waktuMasuk']) ?></td>
                                         <td class="text-end">
                                             <div class="btn-group btn-group-sm">
                                                 <a href="<?= BASE_URL ?>/parkir/keluar?keyword=<?= urlencode($row['idtrx']) ?>" class="btn btn-warning fw-bold" title="Proses Keluar">
-                                                    <i class="fa-solid fa-calculator"></i>
+                                                    <i class="fa-solid fa-calculator me-1"></i> Proses Keluar
                                                 </a>
                                                 <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalVoidRow<?= $row['id'] ?>" title="Batalkan (Void)">
                                                     <i class="fa-solid fa-ban"></i>
@@ -311,16 +385,48 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const btnProsesKeluar = document.getElementById('btnProsesKeluar');
+    const keywordInput = document.getElementById('keyword');
+    const formCheckout = document.getElementById('formCheckout');
+
+    // Auto-Focus Logic
+    if (btnProsesKeluar) {
+        btnProsesKeluar.focus();
+    } else if (keywordInput) {
+        keywordInput.focus();
+    }
+
+    // Enter Key Quick Checkout
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && formCheckout && btnProsesKeluar) {
+            const activeElem = document.activeElement;
+            const isTextfield = activeElem && (activeElem.tagName === 'INPUT' || activeElem.tagName === 'TEXTAREA') && activeElem.id !== 'keyword';
+            // If user is focused on the search box, let search submit normally
+            if (activeElem && activeElem.id === 'keyword') {
+                return;
+            }
+            // If focused on main button or body, trigger checkout
+            if (!isTextfield || activeElem === btnProsesKeluar) {
+                e.preventDefault();
+                btnProsesKeluar.click();
+            }
+        }
+    });
+
+    // Lost Ticket & Calculation Elements
     const checkLost = document.getElementById('checkLost');
     const lostDetails = document.getElementById('lostTicketDetails');
     const inputDenda = document.getElementById('inputDenda');
     const baseTarifInput = document.getElementById('baseTarif');
     const displayTotal = document.getElementById('displayTotalTagihan');
     const inputBayar = document.getElementById('inputBayar');
+    const inputBayarManual = document.getElementById('inputBayarManual');
     const displayKembalian = document.getElementById('displayKembalian');
-    const boxTunai = document.getElementById('boxTunai');
+    const toggleOpsiBayar = document.getElementById('toggleOpsiBayar');
+    const panelManualBayar = document.getElementById('panelManualBayar');
     const boxRefBayar = document.getElementById('boxRefBayar');
-
+    const boxManualTunai = document.getElementById('boxManualTunai');
+    const badgeStatusBayar = document.getElementById('badgeStatusBayar');
     const payRadios = document.querySelectorAll('input[name="cara_bayar"]');
 
     function calculateTotal() {
@@ -335,32 +441,36 @@ document.addEventListener('DOMContentLoaded', function() {
             displayTotal.textContent = 'Rp ' + total.toLocaleString('id-ID');
         }
 
-        const isTunai = document.getElementById('payTunai') ? document.getElementById('payTunai').checked : true;
-
+        // Automatic exact payment default
         if (inputBayar) {
-            inputBayar.min = total;
-            if (isTunai) {
-                if (parseInt(inputBayar.value) < total) {
-                    inputBayar.value = total;
-                }
-            } else {
-                inputBayar.value = total;
+            inputBayar.value = total;
+        }
+        if (inputBayarManual) {
+            inputBayarManual.min = total;
+            if (parseInt(inputBayarManual.value) < total) {
+                inputBayarManual.value = total;
             }
         }
+
         updateKembalian(total);
     }
 
     function updateKembalian(total) {
-        if (!inputBayar || !displayKembalian) return;
+        if (!inputBayarManual || !displayKembalian) return;
         const totalTagihan = total !== undefined ? total : ((parseInt(baseTarifInput?.value) || 0) + ((checkLost?.checked ? parseInt(inputDenda?.value) : 0) || 0));
-        const bayar = parseInt(inputBayar.value) || 0;
+        const bayar = parseInt(inputBayarManual.value) || totalTagihan;
         const kembalian = bayar - totalTagihan;
 
+        // Keep inputBayar synced with manual payment if changed
+        if (inputBayar) {
+            inputBayar.value = bayar;
+        }
+
         if (kembalian >= 0) {
-            displayKembalian.className = 'fw-bold text-success fs-5';
+            displayKembalian.className = 'fw-bold text-success fs-6 text-end pt-1';
             displayKembalian.textContent = 'Rp ' + kembalian.toLocaleString('id-ID');
         } else {
-            displayKembalian.className = 'fw-bold text-danger fs-5';
+            displayKembalian.className = 'fw-bold text-danger fs-6 text-end pt-1';
             displayKembalian.textContent = 'Kurang Rp ' + Math.abs(kembalian).toLocaleString('id-ID');
         }
     }
@@ -380,22 +490,40 @@ document.addEventListener('DOMContentLoaded', function() {
         inputDenda.addEventListener('input', calculateTotal);
     }
 
-    if (inputBayar) {
-        inputBayar.addEventListener('input', function() {
+    if (inputBayarManual) {
+        inputBayarManual.addEventListener('input', function() {
             updateKembalian();
+        });
+    }
+
+    if (toggleOpsiBayar && panelManualBayar) {
+        toggleOpsiBayar.addEventListener('click', function() {
+            if (panelManualBayar.style.display === 'none') {
+                panelManualBayar.style.display = 'block';
+                toggleOpsiBayar.innerHTML = '<i class="fa-solid fa-chevron-up me-1"></i> Sembunyikan Opsi Lanjutan';
+            } else {
+                panelManualBayar.style.display = 'none';
+                toggleOpsiBayar.innerHTML = '<i class="fa-solid fa-sliders me-1"></i> Opsi Lanjutan / Kembalian';
+            }
         });
     }
 
     payRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.value === 'Tunai') {
-                boxTunai.style.display = 'block';
-                boxRefBayar.style.display = 'none';
-                inputBayar.required = true;
+                if (boxManualTunai) boxManualTunai.style.display = 'block';
+                if (boxRefBayar) boxRefBayar.style.display = 'none';
+                if (badgeStatusBayar) {
+                    badgeStatusBayar.className = 'badge bg-success px-3 py-1 font-monospace';
+                    badgeStatusBayar.innerHTML = '<i class="fa-solid fa-check me-1"></i> UANG PAS (OTOMATIS)';
+                }
             } else {
-                boxTunai.style.display = 'none';
-                boxRefBayar.style.display = 'block';
-                inputBayar.required = false;
+                if (boxManualTunai) boxManualTunai.style.display = 'none';
+                if (boxRefBayar) boxRefBayar.style.display = 'block';
+                if (badgeStatusBayar) {
+                    badgeStatusBayar.className = 'badge bg-info px-3 py-1 font-monospace text-dark';
+                    badgeStatusBayar.innerHTML = '<i class="fa-solid fa-qrcode me-1"></i> ' + this.value.toUpperCase() + ' (LUNAS)';
+                }
             }
             calculateTotal();
         });
