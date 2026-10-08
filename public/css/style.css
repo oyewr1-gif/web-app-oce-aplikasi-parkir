@@ -1,0 +1,189 @@
+/* ========================================================
+   Modern Custom Styling - Aplikasi Parkir MVC
+   ======================================================== */
+
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --secondary-color: #64748b;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --dark-bg: #0f172a;
+  --sidebar-width: 260px;
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: #f8fafc;
+  color: #334155;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar & Navigation Layout */
+#wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+#sidebar-wrapper {
+  width: var(--sidebar-width);
+  background: var(--dark-bg);
+  color: #f8fafc;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+#sidebar-wrapper .sidebar-heading {
+  padding: 1.25rem 1.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+#sidebar-wrapper .list-group-item {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  transition: all 0.2s ease-in-out;
+}
+
+#sidebar-wrapper .list-group-item:hover,
+#sidebar-wrapper .list-group-item.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--primary-color);
+}
+
+#page-content-wrapper {
+  flex-grow: 1;
+  overflow-x: hidden;
+}
+
+/* Navbar Top */
+.navbar-top {
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 0.85rem 2rem;
+}
+
+.user-badge {
+  background: #f1f5f9;
+  border-radius: 50px;
+  padding: 0.35rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+/* Cards & Widgets */
+.stat-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card .icon-box {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.bg-primary-light { background: #dbeafe; color: #2563eb; }
+.bg-success-light { background: #d1fae5; color: #059669; }
+.bg-warning-light { background: #fef3c7; color: #d97706; }
+.bg-purple-light  { background: #f3e8ff; color: #9333ea; }
+
+/* Form & Table Cards */
+.card-custom {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  background: #ffffff;
+}
+
+.card-custom .card-header {
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  font-weight: 700;
+  padding: 1rem 1.5rem;
+}
+
+/* Ticket & Receipt Print Styles */
+.ticket-container, .struk-container {
+  max-width: 380px;
+  margin: 30px auto;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px dashed #cbd5e1;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.ticket-header, .struk-header {
+  text-align: center;
+  border-bottom: 2px dashed #94a3b8;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.ticket-body .row-item, .struk-body .row-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.barcode-sim {
+  text-align: center;
+  letter-spacing: 4px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  background: #f8fafc;
+  padding: 10px;
+  border-radius: 6px;
+  margin: 16px 0;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-area, .printable-area * {
+    visibility: visible;
+  }
+  .printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
