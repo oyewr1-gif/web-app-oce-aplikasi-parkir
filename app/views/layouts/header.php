@@ -43,15 +43,51 @@
 
             <!-- Menu Master & Admin Only -->
             <?php if (Session::get('user_level') == 1): ?>
+                <?php 
+                    $isMasterActive = (
+                        strpos($_SERVER['REQUEST_URI'], 'kendaraan') !== false ||
+                        strpos($_SERVER['REQUEST_URI'], 'tarif') !== false ||
+                        strpos($_SERVER['REQUEST_URI'], 'user') !== false ||
+                        strpos($_SERVER['REQUEST_URI'], 'setoran/shift') !== false
+                    );
+                ?>
                 <div class="px-3 text-uppercase text-muted fw-bold small mt-4 mb-1">Administrator</div>
-                <a href="<?= BASE_URL ?>/kendaraan" class="list-group-item <?= (strpos($_SERVER['REQUEST_URI'], 'kendaraan') !== false) ? 'active' : '' ?>">
-                    <i class="fa-solid fa-car"></i> Master Kendaraan
+                
+                <!-- Group Dropdown: Master & Kelola User -->
+                <a class="list-group-item sidebar-dropdown-toggle d-flex justify-content-between align-items-center <?= $isMasterActive ? 'active text-white' : '' ?>" 
+                   data-bs-toggle="collapse" 
+                   href="#menuMasterUser" 
+                   role="button" 
+                   aria-expanded="<?= $isMasterActive ? 'true' : 'false' ?>" 
+                   aria-controls="menuMasterUser">
+                    <span><i class="fa-solid fa-layer-group text-warning"></i> Master & User</span>
+                    <i class="fa-solid fa-chevron-down small chevron-icon"></i>
                 </a>
-                <a href="<?= BASE_URL ?>/user" class="list-group-item <?= (strpos($_SERVER['REQUEST_URI'], 'user') !== false) ? 'active' : '' ?>">
-                    <i class="fa-solid fa-users-gear"></i> Kelola User / Kasir
+                <div class="collapse <?= $isMasterActive ? 'show' : '' ?>" id="menuMasterUser">
+                    <div class="sidebar-submenu">
+                        <div class="px-3 pt-2 pb-1 text-uppercase text-white-50 fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Master Data</div>
+                        <a href="<?= BASE_URL ?>/kendaraan" class="list-group-item submenu-item <?= strpos($_SERVER['REQUEST_URI'], 'kendaraan') !== false ? 'active' : '' ?>">
+                            <i class="fa-solid fa-car text-primary"></i> Master Kendaraan
+                        </a>
+                        <a href="<?= BASE_URL ?>/tarif" class="list-group-item submenu-item <?= strpos($_SERVER['REQUEST_URI'], 'tarif') !== false ? 'active' : '' ?>">
+                            <i class="fa-solid fa-tags text-warning"></i> Master Tarif & Diskon
+                        </a>
+                        <a href="<?= BASE_URL ?>/setoran/shift" class="list-group-item submenu-item <?= strpos($_SERVER['REQUEST_URI'], 'setoran/shift') !== false ? 'active' : '' ?>">
+                            <i class="fa-solid fa-clock-rotate-left text-info"></i> Master Jam Shift
+                        </a>
+
+                        <div class="px-3 pt-2 pb-1 text-uppercase text-white-50 fw-bold border-top border-secondary border-opacity-25 mt-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">Pengguna</div>
+                        <a href="<?= BASE_URL ?>/user" class="list-group-item submenu-item <?= (strpos($_SERVER['REQUEST_URI'], 'user') !== false && strpos($_SERVER['REQUEST_URI'], 'setoran') === false) ? 'active' : '' ?>">
+                            <i class="fa-solid fa-users-gear text-success"></i> Kelola User / Kasir
+                        </a>
+                    </div>
+                </div>
+
+                <a href="<?= BASE_URL ?>/setoran" class="list-group-item <?= (strpos($_SERVER['REQUEST_URI'], 'setoran') !== false && strpos($_SERVER['REQUEST_URI'], 'setoran/shift') === false) ? 'active' : '' ?>">
+                    <i class="fa-solid fa-receipt text-success"></i> Setoran Kasir
                 </a>
                 <a href="<?= BASE_URL ?>/laporan" class="list-group-item <?= (strpos($_SERVER['REQUEST_URI'], 'laporan') !== false) ? 'active' : '' ?>">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> Laporan & Setoran
+                    <i class="fa-solid fa-chart-line text-info"></i> Laporan & Audit Void
                 </a>
             <?php endif; ?>
 
@@ -83,4 +119,3 @@
 
         <!-- Main Body Container -->
         <div class="container-fluid p-4">
-            <?php Session::flash(); ?>

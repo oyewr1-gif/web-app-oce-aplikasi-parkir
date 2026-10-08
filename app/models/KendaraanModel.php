@@ -130,13 +130,13 @@ class KendaraanModel {
     }
 
     public function incrementOccupancy($namaKendaraan) {
-        $this->db->query("UPDATE jenis_kendaraan SET terpakai = COALESCE(terpakai, 0) + 1 WHERE nama = :nama");
+        $this->db->query("UPDATE jenis_kendaraan SET terpakai = COALESCE(terpakai, 0) + 1 WHERE (nama = :nama OR jn_kendaraan = :nama)");
         $this->db->bind(':nama', $namaKendaraan);
         return $this->db->execute();
     }
 
     public function decrementOccupancy($namaKendaraan) {
-        $this->db->query("UPDATE jenis_kendaraan SET terpakai = GREATEST(0, COALESCE(terpakai, 0) - 1) WHERE nama = :nama");
+        $this->db->query("UPDATE jenis_kendaraan SET terpakai = GREATEST(0, COALESCE(terpakai, 0) - 1) WHERE (nama = :nama OR jn_kendaraan = :nama)");
         $this->db->bind(':nama', $namaKendaraan);
         return $this->db->execute();
     }

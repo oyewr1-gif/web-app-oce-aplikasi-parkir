@@ -75,4 +75,12 @@ class Session {
             exit;
         }
     }
+
+    public static function authCheck($role = 'Administrator') {
+        if ($role === 'Administrator') {
+            self::requireAdmin();
+        } else {
+            self::requireLogin();
+        }
+    }
 }

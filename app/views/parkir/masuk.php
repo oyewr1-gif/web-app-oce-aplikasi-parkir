@@ -35,10 +35,14 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fa-solid fa-torii-gate"></i></span>
                                 <select class="form-select" id="gate" name="gate" required>
-                                    <option value="GATE-IN-01" selected>GATE-IN-01 (Utama)</option>
-                                    <option value="GATE-IN-02">GATE-IN-02 (Barat)</option>
-                                    <option value="GATE-IN-03">GATE-IN-03 (Timur)</option>
-                                    <option value="GATE-IN-04">GATE-IN-04 (VIP)</option>
+                                    <?php if (!empty($manless_list)): ?>
+                                        <?php foreach ($manless_list as $m): ?>
+                                            <option value="<?= htmlspecialchars($m['nama']) ?>"><?= htmlspecialchars($m['nama']) ?></option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="MAN R4">MAN R4</option>
+                                        <option value="MAN R2">MAN R2</option>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                         </div>
@@ -47,10 +51,14 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fa-solid fa-door-open"></i></span>
                                 <select class="form-select" id="gateout" name="gateout" required>
-                                    <option value="GATE-OUT-01" selected>GATE-OUT-01 (Utama)</option>
-                                    <option value="GATE-OUT-02">GATE-OUT-02 (Barat)</option>
-                                    <option value="GATE-OUT-03">GATE-OUT-03 (Timur)</option>
-                                    <option value="GATE-OUT-04">GATE-OUT-04 (VIP)</option>
+                                    <?php if (!empty($pos_list)): ?>
+                                        <?php foreach ($pos_list as $p): ?>
+                                            <option value="<?= htmlspecialchars($p['nama']) ?>"><?= htmlspecialchars($p['nama']) ?></option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="POS R4">POS R4</option>
+                                        <option value="POS R2">POS R2</option>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                         </div>
@@ -58,11 +66,8 @@
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-success btn-lg fw-bold">
-                            <i class="fa-solid fa-print me-2"></i> Simpan & Cetak Tiket Parkir
+                            <i class="fa-solid fa-print me-1"></i> Cetak Tiket Parkir & Buka Gate
                         </button>
-                        <a href="<?= BASE_URL ?>/dashboard" class="btn btn-outline-secondary">
-                            <i class="fa-solid fa-arrow-left me-1"></i> Batal / Kembali
-                        </a>
                     </div>
                 </form>
             </div>
