@@ -6,7 +6,7 @@ Dokumen ini menjelaskan rancangan arsitektur, pola desain, serta mekanisme alur 
 
 ## 🏛️ Pola Arsitektur MVC
 
-Aplikasi dibangun menggunakan pola **Model-View-Controller (MVC)** murni tanpa ketergantungan framework eksternal (*zero external framework dependency*), memastikan performa yang cepat dan ringan.
+Aplikasi dibangun menggunakan pola **Model-View-Controller (MVC)** murni tanpa dependensi framework luar (*zero external framework dependency*), memastikan kecepatan eksekusi tinggi, footprint memori minimal, dan pemeliharaan kode yang fleksibel.
 
 ```
                    +-------------------+
@@ -29,13 +29,13 @@ Aplikasi dibangun menggunakan pola **Model-View-Controller (MVC)** murni tanpa k
          v                                       v
 +------------------+                    +------------------+
 |    Controller    | <--- Session Check |    Controller    |
-| (Parkir/Auth/...) |                    | (User/Member/...) |
+| (Parkir/Tarif/..)|                    | (Setoran/User/..)|
 +--------+---------+                    +--------+---------+
          |                                       |
          v                                       v
 +------------------+                    +------------------+
 |      Model       |                    |      Model       |
-| (ParkirModel/...) |                    | (UserModel/...)  |
+| (Parkir/Tarif/..)|                    | (Setoran/User/..)|
 +--------+---------+                    +--------+---------+
          |                                       |
          v                                       v
@@ -58,53 +58,62 @@ Aplikasi dibangun menggunakan pola **Model-View-Controller (MVC)** murni tanpa k
 ## 📂 Struktur Direktori Proyek
 
 ```
-aplikasi-parkir-mvc/
-├── app/                        # Berkas Utama Aplikasi
-│   ├── controllers/            # Controller Penangan Permintaan
-│   │   ├── AuthController.php      # Login & Logout
-│   │   ├── DashboardController.php # Ringkasan Overview & Statistik
-│   │   ├── KendaraanController.php # Master Jenis Kendaraan & Tarif
-│   │   ├── LaporanController.php   # Rekapitulasi Financial Report
-│   │   ├── MemberController.php    # Manajemen Member Langganan
-│   │   ├── ParkirController.php    # Transaksi Masuk (IN) & Keluar (OUT)
-│   │   └── UserController.php      # Manajemen Hak Akses Pengguna
-│   ├── models/                 # Model Akses Database
-│   │   ├── KendaraanModel.php      # Operasi Jenis Kendaraan & Tarif
-│   │   ├── LaporanModel.php        # Kueri Rekapitulasi & Statistik
-│   │   ├── MemberModel.php         # Operasi Member Parkir
-│   │   ├── ParkirModel.php         # Kueri Transaksi Tiket & Tarif
-│   │   └── UserModel.php           # Autentikasi & Histori Login
+aplikasi-parkir/
+├── app/                        # Direktori Inti Aplikasi MVC
+│   ├── controllers/            # Controller Penangan Request & Alur Bisnis
+│   │   ├── AuthController.php      # Login, Logout, dan Verifikasi Kredensial
+│   │   ├── DashboardController.php # Ringkasan Statistik Parkir Real-Time
+│   │   ├── KendaraanController.php # Master Jenis Kendaraan & Kapasitas
+│   │   ├── LaporanController.php   # Laporan Transaksi, Keuangan & Audit VOID
+│   │   ├── MemberController.php    # Manajemen Member Langganan Parkir
+│   │   ├── ParkirController.php    # Gate IN (Masuk), Gate OUT (Keluar), Lost Ticket, Multi-Pay, VOID
+│   │   ├── SetoranController.php   # Rekap Setoran Kasir, Tutup Shift, Cetak Berita Acara
+│   │   ├── TarifController.php     # Master Tarif & Diskon (7 Tab Terintegrasi)
+│   │   └── UserController.php      # Manajemen Akun Pengguna & Log Audit Login
+│   ├── models/                 # Model Data & Akses Basis Data
+│   │   ├── KendaraanModel.php      # Kueri Jenis Kendaraan & Okupansi
+│   │   ├── LaporanModel.php        # Kueri Laporan Filter, Ringkasan, & Audit VOID
+│   │   ├── MemberModel.php         # Kueri Member Parkir & Validasi Nopol
+│   │   ├── ParkirModel.php         # Transaksi Parkir, Hitung Durasi/Tarif, Lost Ticket, Multi-Pay, VOID
+│   │   ├── SetoranModel.php        # Kueri Rekonsiliasi Kas, Jam Shift, Header & Detail Setoran
+│   │   ├── TarifModel.php          # Kueri Skema Tarif (Progresif, Flat, Inap, Lost, Max, Diskon, Libur)
+│   │   └── UserModel.php           # Autentikasi User & Histori Login
 │   └── views/                  # Antarmuka Tampilan (Views)
-│       ├── auth/                   # Tampilan Login
-│       ├── dashboard/              # Tampilan Ringkasan Dashboard
+│       ├── auth/                   # Halaman Login
+│       ├── dashboard/              # Halaman Dashboard Utama
 │       ├── kendaraan/              # Tampilan Master Jenis Kendaraan
-│       ├── laporan/                # Tampilan Rekapitulasi Laporan
-│       ├── layouts/                # Header & Footer Bootstrap
-│       ├── member/                 # Tampilan Pengelolaan Member
-│       ├── parkir/                 # Tampilan Masuk, Keluar, Tiket, Struk
-│       └── user/                   # Tampilan Pengelolaan User & Histori
-├── config/                     # Konfigurasi Berkas
-│   └── database.php                # Database Host, Port, Creds, & BASE_URL
-├── core/                       # Core Framework Component
-│   ├── App.php                     # URL Router & Dispatcher
-│   ├── Controller.php              # Base Controller Helper
-│   ├── Database.php                # PDO Wrapper Layer
-│   └── Session.php                 # Session & Flash Message Helper
+│       ├── laporan/                # Tampilan Laporan Transaksi & Tab Audit VOID
+│       ├── layouts/                # Template Header & Footer (Sidebar & Navbar)
+│       ├── member/                 # Tampilan Pengelolaan Member Parkir
+│       ├── parkir/                 # Tampilan Masuk, Keluar, Cetak Tiket, Cetak Struk
+│       ├── setoran/                # Riwayat Setoran, Form Tutup Shift, Cetak Berita Acara, Jam Shift
+│       ├── tarif/                  # Halaman Nav-Tabs Master Tarif Lengkap & Diskon
+│       └── user/                   # Manajemen Pengguna & Riwayat Login
+├── config/                     # Konfigurasi Lingkungan & Database
+│   └── database.php                # Pembaca .env, Koneksi PDO, & Konfigurasi BASE_URL
+├── core/                       # Komponen Fondasi MVC Framework
+│   ├── App.php                     # Router Front Controller & Pengurai URL
+│   ├── Controller.php              # Base Controller (View Loader & Model Factory)
+│   ├── Database.php                # PDO Database Wrapper
+│   └── Session.php                 # Session Manager, Flash Messages, & Auth Guards
 ├── docs/                       # Dokumentasi Resmi Aplikasi
 │   ├── README.md                   # Indeks Dokumentasi
-│   ├── ARCHITECTURE.md             # Arsitektur & Struktur
-│   ├── DATABASE.md                 # Skema Database & Relasi
-│   ├── USER_GUIDE.md               # Panduan Pengoperasian
-│   └── API_AND_MODELS.md           # Referensi Teknis API & Model
-├── public/                     # Public Web Root Directory
-│   ├── css/                        # Custom Stylesheet
-│   ├── js/                         # JavaScript Client-side Logic
-│   ├── .htaccess                   # Apache URL Rewrite Public
-│   └── index.php                   # Public Front Controller Entrypoint
-├── .htaccess                   # Apache Root Subfolder Rewrite
+│   ├── CHANGELOG.md                # Riwayat Pembaruan & Fitur Baru
+│   ├── ARCHITECTURE.md             # Arsitektur & Struktur Kode
+│   ├── DATABASE.md                 # Dokumentasi Skema & Relasi Database
+│   ├── USER_GUIDE.md               # Panduan Pengoperasian Pengguna
+│   ├── API_AND_MODELS.md           # Referensi Teknis API & Model
+│   └── WALKTHROUGH.md              # Rangkuman Pengujian & Deployment
+├── public/                     # Direktori Akses Publik Web Server
+│   ├── css/                        # Custom CSS Stylesheet
+│   ├── js/                         # JavaScript Logika Frontend
+│   ├── .htaccess                   # Rewrite Engine Apache (Subfolder/URL Routing)
+│   └── index.php                   # Entrypoint Utama Aplikasi
+├── .env                        # File Variabel Lingkungan Lokal
+├── .htaccess                   # Rewrite Engine Root Apache
 ├── index.php                   # Fallback Entrypoint Root
-├── README.md                   # Panduan Cepat Proyek
-└── schema_and_seed.sql         # Skema DDL Database & Seed Data
+├── README.md                   # Ringkasan Proyek
+└── schema_and_seed.sql         # Skema Database & Data Awal
 ```
 
 ---
@@ -115,6 +124,18 @@ Format URL pada aplikasi mengikuti pola standar Front Controller:
 
 $$\text{URL} = \text{BASE\_URL} / \text{controller} / \text{method} / [\text{param1}, \text{param2}, \dots]$$
 
-### Mekanisme Parsing Rute Dinamis (`parseUrl`):
-1. **Prioritas 1**: Membaca variabel `$_GET['url']` (yang dipisahkan oleh `.htaccess`).
-2. **Prioritas 2 (Fallback)**: Membaca `$_SERVER['REQUEST_URI']` apabila aplikasi dijalankan di subfolder, XAMPP, atau `php -S`. Parser otomatis memotong nama direktori pembungkus sehingga rute tetap terbaca secara konsisten.
+### Mekanisme Penguraian Rute Dinamis (`parseUrl`):
+1. **Prioritas 1**: Membaca variabel `$_GET['url']` (yang diteruskan oleh file `.htaccess`).
+2. **Prioritas 2 (Fallback)**: Membaca `$_SERVER['REQUEST_URI']` apabila aplikasi dijalankan di subfolder, XAMPP, atau `php -S`. Parser otomatis memotong awalan direktori pembungkus sehingga rute tetap terbaca secara konsisten tanpa merusak parameter GET.
+
+### Mekanisme Penentuan `BASE_URL`:
+- Jika variabel `BASE_URL` diset di berkas `.env` (misal: `http://localhost/aplikasi-parkir`), aplikasi secara eksplisit menggunakan alamat tersebut untuk membangun seluruh link navigasi dan asset statis (CSS/JS).
+- Jika kosong, aplikasi secara otomatis mendeteksi protokol (`http` / `https`), host domain, dan folder skrip saat ini.
+
+---
+
+## 🔒 Otentikasi & Otorisasi (`core/Session.php`)
+
+Setiap Controller dilindungi dengan mekanisme penjagaan akses (*Auth Guard*):
+- **`Session::requireLogin()`**: Mewajibkan pengguna berstatus login; mengalihkan pengguna ke `/auth/login` jika belum terotentikasi.
+- **`Session::requireAdmin()`** / **`Session::authCheck('Administrator')`**: Memverifikasi level pengguna (`user_level == 1`). Jika level tidak memenuhi syarat, pengguna dialihkan ke `/dashboard` dengan pesan peringatan penolakan akses.

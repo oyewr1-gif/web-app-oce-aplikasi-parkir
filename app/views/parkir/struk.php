@@ -13,7 +13,7 @@
 <div class="struk-container printable-area">
     <div class="struk-header">
         <h5 class="fw-bold mb-1">STRUK PEMBAYARAN PARKIR</h5>
-        <div class="small text-muted">LUNAS</div>
+        <div class="small fw-bold text-success">STATUS: LUNAS</div>
     </div>
 
     <div class="struk-body">
@@ -23,7 +23,7 @@
         </div>
         <div class="row-item">
             <span>NOPOL:</span>
-            <span class="fw-bold fs-5"><?= htmlspecialchars($trx['nopol']) ?></span>
+            <span class="fw-bold fs-5"><?= htmlspecialchars(!empty($trx['nopol']) ? $trx['nopol'] : '-') ?></span>
         </div>
         <div class="row-item">
             <span>JENIS:</span>
@@ -32,7 +32,7 @@
         <hr style="border-style: dashed;">
         <div class="row-item">
             <span>GATE MASUK:</span>
-            <span class="fw-bold"><?= htmlspecialchars($trx['gate'] ?? 'GATE-IN-01') ?></span>
+            <span class="fw-bold"><?= htmlspecialchars($trx['gate'] ?? 'POS-IN-01') ?></span>
         </div>
         <div class="row-item">
             <span>WAKTU MASUK:</span>
@@ -40,7 +40,7 @@
         </div>
         <div class="row-item">
             <span>GATE KELUAR:</span>
-            <span class="fw-bold"><?= htmlspecialchars($trx['gateout'] ?? 'GATE-OUT-01') ?></span>
+            <span class="fw-bold"><?= htmlspecialchars($trx['gateout'] ?? 'POS-OUT-01') ?></span>
         </div>
         <div class="row-item">
             <span>WAKTU KELUAR:</span>
@@ -52,22 +52,48 @@
         </div>
         <hr style="border-style: dashed;">
         <div class="row-item">
-            <span>TOTAL TARIF:</span>
-            <span class="fw-bold">Rp <?= number_format($trx['tarif']) ?></span>
+            <span>TARIF PARKIR:</span>
+            <span>Rp <?= number_format($trx['tarif']) ?></span>
+        </div>
+        <?php if (!empty($trx['denda']) && $trx['denda'] > 0): ?>
+            <div class="row-item text-danger">
+                <span>DENDA TIKET HILANG:</span>
+                <span class="fw-bold">Rp <?= number_format($trx['denda']) ?></span>
+            </div>
+            <?php if (!empty($trx['nostnk'])): ?>
+                <div class="row-item small text-muted">
+                    <span>NO. STNK:</span>
+                    <span><?= htmlspecialchars($trx['nostnk']) ?></span>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+        <div class="row-item fw-bold border-top pt-1">
+            <span>TOTAL BIAYA:</span>
+            <span>Rp <?= number_format($trx['tarif'] + ($trx['denda'] ?? 0)) ?></span>
         </div>
         <div class="row-item">
-            <span>BAYAR:</span>
+            <span>METODE BAYAR:</span>
+            <span class="fw-bold"><?= htmlspecialchars($trx['cara_bayar'] ?: 'Tunai') ?></span>
+        </div>
+        <?php if (!empty($trx['refbayar'])): ?>
+            <div class="row-item small">
+                <span>NO. REFF:</span>
+                <span><?= htmlspecialchars($trx['refbayar']) ?></span>
+            </div>
+        <?php endif; ?>
+        <div class="row-item">
+            <span>UANG DITERIMA:</span>
             <span>Rp <?= number_format($trx['bayar']) ?></span>
         </div>
         <div class="row-item">
-            <span>KEMBALI:</span>
-            <span>Rp <?= number_format($trx['kembalian']) ?></span>
+            <span>KEMBALIAN:</span>
+            <span class="fw-bold">Rp <?= number_format($trx['kembalian']) ?></span>
         </div>
     </div>
 
-    <div class="mt-4 pt-2 border-top text-center small text-muted">
-        <div>Petugas Kasir: <?= htmlspecialchars(Session::get('user_name') ?? 'Kasir') ?></div>
-        <div class="mt-1 font-monospace">--- Terima Kasih ---</div>
+    <div class="struk-footer">
+        <p class="mb-0">Terima kasih atas kunjungan Anda.</p>
+        <p class="mb-0">Simpan struk ini sebagai bukti pembayaran yang sah.</p>
     </div>
 </div>
 

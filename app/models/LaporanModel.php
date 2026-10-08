@@ -48,14 +48,32 @@ class LaporanModel {
 
         $this->db->query("SELECT 
             COUNT(id) AS total_transaksi,
-            COALESCE(SUM(CASE WHEN status = 'S' THEN tarif ELSE 0 END), 0) AS total_pendapatan,
+            COALESCE(SUM(CASE WHEN status = 'S' THEN (tarif + COALESCE(denda, 0)) ELSE 0 END), 0) AS total_pendapatan,
+            COALESCE(SUM(CASE WHEN status = 'S' THEN COALESCE(denda, 0) ELSE 0 END), 0) AS total_denda,
             COALESCE(SUM(CASE WHEN status = 'B' THEN 1 ELSE 0 END), 0) AS total_aktif,
-            COALESCE(SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END), 0) AS total_selesai
+            COALESCE(SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END), 0) AS total_selesai,
+            COALESCE(SUM(CASE WHEN status = 'N' THEN 1 ELSE 0 END), 0) AS total_batal
             FROM jurnal_transaksi 
             WHERE tgl_masuk BETWEEN :startDate AND :endDate OR tgl_keluar BETWEEN :startDate AND :endDate");
             
         $this->db->bind(':startDate', $startDate);
         $this->db->bind(':endDate', $endDate);
         return $this->db->single();
+    }
+
+    public function getVoidReports($startDate = null, $endDate = null, $limit = 100) {
+        if (!$startDate) $startDate = date('Y-m-d');
+        if (!$endDate) $endDate = date('Y-m-d');
+
+        $this->db->query("SELECT j.*, u.nama AS executor_nama 
+                          FROM jurnal_transaksi j 
+                          LEFT JOIN user u ON u.id = j.iduser_pembatalan 
+                          WHERE j.status = 'N' AND (DATE(j.waktubatal) BETWEEN :startDate AND :endDate OR j.tgl_masuk BETWEEN :startDate AND :endDate) 
+                          ORDER BY j.waktubatal DESC, j.id DESC 
+                          LIMIT :limit");
+        $this->db->bind(':startDate', $startDate);
+        $this->db->bind(':endDate', $endDate);
+        $this->db->bind(':limit', (int)$limit, PDO::PARAM_INT);
+        return $this->db->resultSet();
     }
 }

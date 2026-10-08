@@ -5,10 +5,13 @@ class ParkirController extends Controller {
     public function masuk() {
         Session::requireLogin();
         $kendaraanModel = $this->model('KendaraanModel');
+        $parkirModel = $this->model('ParkirModel');
         
         $data = [
             'title' => 'Kendaraan Masuk (Cetak Tiket)',
-            'jenis_list' => $kendaraanModel->getAllJenisKendaraan()
+            'jenis_list' => $kendaraanModel->getAllJenisKendaraan(),
+            'manless_list' => $parkirModel->getManlessGates(),
+            'pos_list' => $parkirModel->getPosKasirGates()
         ];
         
         $this->view('parkir/masuk', $data);
@@ -20,8 +23,8 @@ class ParkirController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $nopol = trim($_POST['nopol'] ?? '');
             $jnKendaraan = trim($_POST['jn_kendaraan'] ?? '');
-            $gate = trim($_POST['gate'] ?? 'GATE-IN-01');
-            $gateout = trim($_POST['gateout'] ?? 'GATE-OUT-01');
+            $gate = trim($_POST['gate'] ?? 'MAN R4');
+            $gateout = trim($_POST['gateout'] ?? 'POS R4');
 
             if (empty($nopol) || empty($jnKendaraan)) {
                 Session::setFlash('Nomor Polisi dan Jenis Kendaraan wajib diisi.', 'danger');
@@ -73,6 +76,8 @@ class ParkirController extends Controller {
             $trx = $parkirModel->getActiveTransactionByKeyword($keyword);
             if ($trx) {
                 $calc = $parkirModel->hitungTarif($trx['waktuMasuk'], $trx['jn_kendaraan']);
+                $calc['denda_lost_default'] = $parkirModel->getTarifLostByKendaraan($trx['jn_kendaraan']);
+                
                 // Check if vehicle owner is a registered active member
                 $memberInfo = $memberModel->getMemberByNopol($trx['nopol']);
                 if ($memberInfo) {
@@ -81,7 +86,7 @@ class ParkirController extends Controller {
                     $calc['member_name'] = $memberInfo['nama'];
                 }
             } else {
-                Session::setFlash('Transaksi parkir aktif tidak ditemukan untuk nomor tiket/nopol: ' . htmlspecialchars($keyword), 'danger');
+                Session::setFlash('Transaksi parkir aktif tidak ditemukan untuk tiket/nopol: ' . htmlspecialchars($keyword), 'danger');
             }
         }
 
@@ -90,7 +95,8 @@ class ParkirController extends Controller {
             'keyword' => $keyword,
             'trx' => $trx,
             'calc' => $calc,
-            'active_list' => $parkirModel->getActiveTransactions()
+            'pos_list' => $parkirModel->getPosKasirGates(),
+            'active_list' => $parkirModel->getActiveVehicles(15)
         ];
 
         $this->view('parkir/keluar', $data);
@@ -102,7 +108,16 @@ class ParkirController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $idtrx = trim($_POST['idtrx'] ?? '');
             $bayar = (int)($_POST['bayar'] ?? 0);
-            $gateout = trim($_POST['gateout'] ?? 'GATE-OUT-01');
+            $gateout = trim($_POST['gateout'] ?? 'POS R4');
+            $cara_bayar = trim($_POST['cara_bayar'] ?? 'Tunai');
+            $refbayar = trim($_POST['refbayar'] ?? '');
+
+            $is_lost = !empty($_POST['is_lost']);
+            $denda = $is_lost ? (int)($_POST['denda'] ?? 0) : 0;
+            $nostnk = trim($_POST['nostnk'] ?? '');
+            $noktp = trim($_POST['noktp'] ?? '');
+            $nohp = trim($_POST['nohp'] ?? '');
+            $nama = trim($_POST['nama_pemilik'] ?? '');
 
             if (empty($idtrx)) {
                 Session::setFlash('ID Transaksi tidak valid.', 'danger');
@@ -113,7 +128,7 @@ class ParkirController extends Controller {
             $kendaraanModel = $this->model('KendaraanModel');
             $memberModel = $this->model('MemberModel');
 
-            $trx = $parkirModel->getTransactionByIdTrx($idtrx);
+            $trx = $parkirModel->getTransactionById($idtrx);
             if (!$trx || $trx['status'] !== 'B') {
                 Session::setFlash('Status transaksi sudah selesai atau tidak ditemukan.', 'danger');
                 $this->redirect('/parkir/keluar');
@@ -121,22 +136,41 @@ class ParkirController extends Controller {
 
             $calc = $parkirModel->hitungTarif($trx['waktuMasuk'], $trx['jn_kendaraan']);
             
+            $nopol_update = strtoupper(trim($_POST['nopol_update'] ?? ''));
+            $effectiveNopol = !empty($nopol_update) ? $nopol_update : ($trx['nopol'] ?? '');
+
             // Check member
-            $memberInfo = $memberModel->getMemberByNopol($trx['nopol']);
-            if ($memberInfo) {
-                $calc['tarif'] = 0;
+            if (!empty($effectiveNopol)) {
+                $memberInfo = $memberModel->getMemberByNopol($effectiveNopol);
+                if ($memberInfo) {
+                    $calc['tarif'] = 0;
+                }
             }
 
-            if ($bayar < $calc['tarif']) {
-                Session::setFlash('Uang pembayaran kurang! Total tarif: Rp ' . number_format($calc['tarif']), 'danger');
+            $totalTagihan = $calc['tarif'] + $denda;
+
+            if ($cara_bayar === 'Tunai' && $bayar < $totalTagihan) {
+                Session::setFlash('Uang tunai kurang! Total tagihan: Rp ' . number_format($totalTagihan), 'danger');
                 $this->redirect('/parkir/keluar?keyword=' . $idtrx);
             }
 
-            $success = $parkirModel->catatKeluar($idtrx, $calc, $bayar, $gateout);
+            $options = [
+                'nopol' => $effectiveNopol,
+                'cara_bayar' => $cara_bayar,
+                'refbayar' => $refbayar,
+                'denda' => $denda,
+                'nostnk' => $nostnk,
+                'noktp' => $noktp,
+                'nohp' => $nohp,
+                'nama' => $nama
+            ];
+
+            $success = $parkirModel->catatKeluar($idtrx, $calc, $bayar, $gateout, $options);
 
             if ($success) {
                 $kendaraanModel->decrementOccupancy($trx['jn_kendaraan']);
-                Session::setFlash('Pembayaran berhasil! Kembalian: Rp ' . number_format($bayar - $calc['tarif']), 'success');
+                $kembalian = ($cara_bayar === 'Tunai') ? ($bayar - $totalTagihan) : 0;
+                Session::setFlash('Pembayaran berhasil (' . $cara_bayar . ')! Kembalian: Rp ' . number_format($kembalian), 'success');
                 $this->redirect('/parkir/struk/' . $idtrx);
             } else {
                 Session::setFlash('Gagal memproses transaksi keluar.', 'danger');
@@ -145,10 +179,36 @@ class ParkirController extends Controller {
         }
     }
 
+    public function void() {
+        Session::requireLogin();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $idtrx = trim($_POST['idtrx'] ?? '');
+            $ketbatal = trim($_POST['ketbatal'] ?? '');
+            $user = Session::get('user');
+            $iduser = $user['id'] ?? 1;
+
+            if (!empty($idtrx) && !empty($ketbatal)) {
+                $parkirModel = $this->model('ParkirModel');
+                $trx = $parkirModel->getTransactionById($idtrx);
+                
+                if ($trx && $trx['status'] === 'B') {
+                    $kendaraanModel = $this->model('KendaraanModel');
+                    $kendaraanModel->decrementOccupancy($trx['jn_kendaraan']);
+                }
+
+                $parkirModel->voidTransaction($idtrx, $ketbatal, $iduser);
+                Session::setFlash('Transaksi ' . $idtrx . ' berhasil DIBATALKAN (VOID)!', 'warning');
+            } else {
+                Session::setFlash('ID Transaksi dan alasan pembatalan wajib diisi.', 'danger');
+            }
+        }
+        $this->redirect($_SERVER['HTTP_REFERER'] ?? '/parkir/keluar');
+    }
+
     public function tiket($idtrx = '') {
         Session::requireLogin();
         $parkirModel = $this->model('ParkirModel');
-        $trx = $parkirModel->getTransactionByIdTrx($idtrx);
+        $trx = $parkirModel->getTransactionById($idtrx);
 
         if (!$trx) {
             Session::setFlash('Tiket parkir tidak ditemukan.', 'danger');
@@ -166,7 +226,7 @@ class ParkirController extends Controller {
     public function struk($idtrx = '') {
         Session::requireLogin();
         $parkirModel = $this->model('ParkirModel');
-        $trx = $parkirModel->getTransactionByIdTrx($idtrx);
+        $trx = $parkirModel->getTransactionById($idtrx);
 
         if (!$trx) {
             Session::setFlash('Struk pembayaran tidak ditemukan.', 'danger');
