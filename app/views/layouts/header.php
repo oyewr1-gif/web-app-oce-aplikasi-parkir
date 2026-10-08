@@ -48,6 +48,7 @@
                         strpos($_SERVER['REQUEST_URI'], 'kendaraan') !== false ||
                         strpos($_SERVER['REQUEST_URI'], 'tarif') !== false ||
                         strpos($_SERVER['REQUEST_URI'], 'user') !== false ||
+                        strpos($_SERVER['REQUEST_URI'], 'kamera') !== false ||
                         strpos($_SERVER['REQUEST_URI'], 'setoran/shift') !== false
                     );
                 ?>
@@ -71,6 +72,9 @@
                         </a>
                         <a href="<?= BASE_URL ?>/tarif" class="list-group-item submenu-item <?= strpos($_SERVER['REQUEST_URI'], 'tarif') !== false ? 'active' : '' ?>">
                             <i class="fa-solid fa-tags text-warning"></i> Master Tarif & Diskon
+                        </a>
+                        <a href="<?= BASE_URL ?>/kamera" class="list-group-item submenu-item <?= strpos($_SERVER['REQUEST_URI'], 'kamera') !== false ? 'active' : '' ?>">
+                            <i class="fa-solid fa-video text-danger"></i> IP Camera Gate
                         </a>
                         <a href="<?= BASE_URL ?>/setoran/shift" class="list-group-item submenu-item <?= strpos($_SERVER['REQUEST_URI'], 'setoran/shift') !== false ? 'active' : '' ?>">
                             <i class="fa-solid fa-clock-rotate-left text-info"></i> Master Jam Shift

@@ -111,6 +111,32 @@
                                     </div>
                                 <?php endif; ?>
 
+                                <!-- Snapshot Foto Masuk (Mini Thumbnails) -->
+                                <div class="mt-2 pt-2 border-top">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small fw-bold text-secondary"><i class="fa-solid fa-camera me-1"></i> Snapshot Foto Masuk:</span>
+                                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">Gate: <?= htmlspecialchars($trx['gate'] ?? 'MAN R4') ?></span>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="position-relative border rounded overflow-hidden bg-dark text-center" style="cursor: pointer;" onclick="showZoomModal('Snapshot Kendaraan Masuk', '<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($trx['idtrx']) ?>&nopol=<?= urlencode($trx['nopol'] ?? '') ?>&label=IN_KENDARAAN&path=<?= urlencode($photos['foto_masuk1'] ?? '') ?>&time=<?= urlencode($trx['waktuMasuk']) ?>')">
+                                                <img src="<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($trx['idtrx']) ?>&nopol=<?= urlencode($trx['nopol'] ?? '') ?>&label=IN_KENDARAAN&path=<?= urlencode($photos['foto_masuk1'] ?? '') ?>&time=<?= urlencode($trx['waktuMasuk']) ?>" alt="Foto Kendaraan" class="img-fluid" style="height: 72px; width: 100%; object-fit: cover;">
+                                                <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-75 text-white py-0 small text-truncate" style="font-size: 0.68rem;">
+                                                    <i class="fa-solid fa-car me-1"></i> Kendaraan / Plat
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="position-relative border rounded overflow-hidden bg-dark text-center" style="cursor: pointer;" onclick="showZoomModal('Snapshot Pengemudi Masuk', '<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($trx['idtrx']) ?>&nopol=<?= urlencode($trx['nopol'] ?? '') ?>&label=IN_DRIVER&path=<?= urlencode($photos['foto_masuk2'] ?? '') ?>&time=<?= urlencode($trx['waktuMasuk']) ?>')">
+                                                <img src="<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($trx['idtrx']) ?>&nopol=<?= urlencode($trx['nopol'] ?? '') ?>&label=IN_DRIVER&path=<?= urlencode($photos['foto_masuk2'] ?? '') ?>&time=<?= urlencode($trx['waktuMasuk']) ?>" alt="Foto Pengemudi" class="img-fluid" style="height: 72px; width: 100%; object-fit: cover;">
+                                                <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-75 text-white py-0 small text-truncate" style="font-size: 0.68rem;">
+                                                    <i class="fa-solid fa-user me-1"></i> Wajah Driver
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Tiket Hilang & Denda (Collapsible Ringkas) -->
                                 <div class="mt-2 pt-2 border-top">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -529,6 +555,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function showZoomModal(title, url) {
+    document.getElementById('zoomModalTitle').innerHTML = '<i class="fa-solid fa-camera me-2 text-warning"></i> ' + title;
+    document.getElementById('zoomModalImage').src = url;
+    const modal = new bootstrap.Modal(document.getElementById('modalZoomFoto'));
+    modal.show();
+}
 </script>
+
+<!-- Modal Zoom Foto Lightbox -->
+<div class="modal fade" id="modalZoomFoto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white py-2">
+                <h6 class="modal-title fw-bold" id="zoomModalTitle"><i class="fa-solid fa-camera me-2 text-warning"></i> Inspeksi Foto</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0 text-center bg-black">
+                <img id="zoomModalImage" src="" class="img-fluid w-100" style="max-height: 520px; object-fit: contain;" alt="Zoom Foto">
+            </div>
+            <div class="modal-footer py-2 bg-light d-flex justify-content-between">
+                <span class="small text-muted font-monospace"><i class="fa-solid fa-circle-info me-1"></i> Klik atau gunakan tombol Esc untuk menutup</span>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php require_once '../app/views/layouts/footer.php'; ?>

@@ -3,7 +3,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4 no-print">
     <div>
         <h4 class="fw-bold mb-0">Laporan Transaksi & Pendapatan Parkir</h4>
-        <p class="text-muted small mb-0">Rekapitulasi pendapatan, jurnal histori transaksi kendaraan, dan log pembatalan transaksi (VOID).</p>
+        <p class="text-muted small mb-0">Rekapitulasi pendapatan, jurnal histori transaksi kendaraan, galeri audit foto CCTV, dan log pembatalan transaksi (VOID).</p>
     </div>
     <button onclick="window.print()" class="btn btn-outline-primary fw-bold">
         <i class="fa-solid fa-print me-1"></i> Cetak Laporan
@@ -23,7 +23,13 @@
                 <label for="tgl_akhir" class="form-label fw-semibold small">Tanggal Akhir</label>
                 <input type="date" class="form-control" id="tgl_akhir" name="tgl_akhir" value="<?= htmlspecialchars($tgl_akhir) ?>">
             </div>
-            <?php if ($tab !== 'void'): ?>
+
+            <?php if ($tab === 'foto'): ?>
+                <div class="col-12 col-md-4">
+                    <label for="kw_foto" class="form-label fw-semibold small">Cari Tiket / Plat Nomor</label>
+                    <input type="text" class="form-control text-uppercase" id="kw_foto" name="kw_foto" value="<?= htmlspecialchars($kw_foto ?? '') ?>" placeholder="Ketik No. Tiket atau Plat...">
+                </div>
+            <?php elseif ($tab !== 'void'): ?>
                 <div class="col-12 col-md-2">
                     <label for="status" class="form-label fw-semibold small">Status Parkir</label>
                     <select class="form-select" id="status" name="status">
@@ -45,6 +51,7 @@
                     </select>
                 </div>
             <?php endif; ?>
+
             <div class="col-12 col-md-2">
                 <button type="submit" class="btn btn-primary w-100 fw-bold">
                     <i class="fa-solid fa-filter me-1"></i> Terapkan Filter
@@ -85,11 +92,17 @@
     </div>
 </div>
 
-<!-- Nav Tabs -->
+<!-- Nav Tabs: 3 Tabs (Jurnal, Audit Foto, VOID) -->
 <ul class="nav nav-pills mb-3 no-print">
     <li class="nav-item">
-        <a class="nav-link <?= $tab !== 'void' ? 'active' : '' ?>" href="<?= BASE_URL ?>/laporan?tab=transaksi&tgl_mulai=<?= $tgl_mulai ?>&tgl_akhir=<?= $tgl_akhir ?>">
-            <i class="fa-solid fa-list me-1"></i> Jurnal Transaksi Masuk/Keluar
+        <a class="nav-link <?= $tab === 'transaksi' || empty($tab) ? 'active' : '' ?>" href="<?= BASE_URL ?>/laporan?tab=transaksi&tgl_mulai=<?= $tgl_mulai ?>&tgl_akhir=<?= $tgl_akhir ?>">
+            <i class="fa-solid fa-list me-1"></i> Jurnal Transaksi
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link <?= $tab === 'foto' ? 'active bg-primary text-white' : '' ?>" href="<?= BASE_URL ?>/laporan?tab=foto&tgl_mulai=<?= $tgl_mulai ?>&tgl_akhir=<?= $tgl_akhir ?>">
+            <i class="fa-solid fa-images me-1"></i> Audit Foto Kendaraan 
+            <span class="badge bg-light text-dark ms-1"><?= number_format($total_photo_audit) ?></span>
         </a>
     </li>
     <li class="nav-item">
@@ -100,7 +113,7 @@
 </ul>
 
 <!-- TAB 1: Transaksi Normal -->
-<?php if ($tab !== 'void'): ?>
+<?php if ($tab === 'transaksi' || empty($tab)): ?>
     <div class="card card-custom printable-area">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span class="fw-bold">Rincian Transaksi (<?= htmlspecialchars($tgl_mulai) ?> s.d <?= htmlspecialchars($tgl_akhir) ?>)</span>
@@ -132,7 +145,7 @@
                             <?php foreach ($reports as $r): ?>
                                 <tr>
                                     <td><span class="badge bg-light text-dark border font-monospace"><?= htmlspecialchars($r['idtrx']) ?></span></td>
-                                    <td class="fw-bold text-primary"><?= htmlspecialchars($r['nopol']) ?></td>
+                                    <td class="fw-bold text-primary"><?= htmlspecialchars($r['nopol'] ?: '-') ?></td>
                                     <td><?= htmlspecialchars($r['jn_kendaraan']) ?></td>
                                     <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($r['gate'] ?? '-') ?></span></td>
                                     <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($r['gateout'] ?? '-') ?></span></td>
@@ -160,7 +173,115 @@
         </div>
     </div>
 
-<!-- TAB 2: Pembatalan / VOID -->
+<!-- TAB 2: AUDIT FOTO KENDARAAN (KOMPARASI MASUK VS KELUAR) -->
+<?php elseif ($tab === 'foto'): ?>
+    <div class="card card-custom shadow-sm border-0 mb-4 printable-area">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+            <div>
+                <span class="fw-bold text-dark"><i class="fa-solid fa-camera text-primary me-2"></i> Galeri Audit Foto CCTV Masuk vs Keluar</span>
+                <span class="text-muted small ms-2">(Menampilkan <?= count($photo_audit) ?> dari <?= number_format($total_photo_audit) ?> rekaman)</span>
+            </div>
+            <div>
+                <span class="badge bg-info text-dark font-monospace"><i class="fa-solid fa-circle-info me-1"></i> Klik foto untuk memperbesar</span>
+            </div>
+        </div>
+        <div class="card-body p-3 bg-light">
+            <?php if (empty($photo_audit)): ?>
+                <div class="text-center py-5 text-muted bg-white rounded border">
+                    <i class="fa-solid fa-images fs-1 text-secondary d-block mb-3"></i>
+                    <h5>Tidak Ada Data Rekaman Foto</h5>
+                    <p class="small text-muted mb-0">Tidak ditemukan transaksi dengan rekaman snapshot foto pada kriteria pencarian ini.</p>
+                </div>
+            <?php else: ?>
+                <div class="row g-3">
+                    <?php foreach ($photo_audit as $p): ?>
+                        <div class="col-12 col-xl-6">
+                            <div class="card card-custom h-100 shadow-sm border bg-white">
+                                <!-- Card Header: Info Transaksi -->
+                                <div class="card-header bg-white py-2 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-dark font-monospace"><?= htmlspecialchars($p['idtrx']) ?></span>
+                                        <span class="fw-bold text-primary fs-6"><?= htmlspecialchars($p['nopol'] ?: 'TANPA NOPOL') ?></span>
+                                        <span class="badge bg-secondary small"><?= htmlspecialchars($p['jn_kendaraan']) ?></span>
+                                    </div>
+                                    <div>
+                                        <?php if ($p['status'] === 'S'): ?>
+                                            <span class="badge bg-success">Lunas (S)</span>
+                                        <?php elseif ($p['status'] === 'B'): ?>
+                                            <span class="badge bg-warning text-dark">Parkir (B)</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger">Void (N)</span>
+                                        <?php endif; ?>
+                                        <span class="small text-muted ms-1 font-monospace"><?= htmlspecialchars($p['durasi'] ?: '-') ?></span>
+                                    </div>
+                                </div>
+
+                                <!-- Card Body: Komparasi Foto 2 Sisi -->
+                                <div class="card-body p-3">
+                                    <div class="row g-2 text-center">
+                                        <!-- SISI MASUK (GATE IN) -->
+                                        <div class="col-6 border-end">
+                                            <div class="small fw-bold text-success mb-1 text-uppercase" style="font-size: 0.75rem;">
+                                                <i class="fa-solid fa-right-to-bracket me-1"></i> Saat Masuk (<?= htmlspecialchars($p['gate'] ?? 'IN') ?>)
+                                            </div>
+                                            <div class="small text-muted mb-2" style="font-size: 0.72rem;"><?= htmlspecialchars($p['waktuMasuk']) ?></div>
+                                            
+                                            <div class="row g-1">
+                                                <div class="col-6">
+                                                    <div class="border rounded overflow-hidden bg-dark position-relative" style="cursor: pointer;" onclick="showZoomModal('<?= htmlspecialchars($p['idtrx']) ?> - Kendaraan Masuk', '<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($p['idtrx']) ?>&nopol=<?= urlencode($p['nopol'] ?? '') ?>&label=IN_KENDARAAN&path=<?= urlencode($p['foto_masuk1'] ?? '') ?>&time=<?= urlencode($p['waktuMasuk']) ?>')">
+                                                        <img src="<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($p['idtrx']) ?>&nopol=<?= urlencode($p['nopol'] ?? '') ?>&label=IN_KENDARAAN&path=<?= urlencode($p['foto_masuk1'] ?? '') ?>&time=<?= urlencode($p['waktuMasuk']) ?>" alt="Plat Masuk" class="img-fluid" style="height: 85px; width: 100%; object-fit: cover;">
+                                                        <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-75 text-white small" style="font-size: 0.65rem;">Kendaraan</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="border rounded overflow-hidden bg-dark position-relative" style="cursor: pointer;" onclick="showZoomModal('<?= htmlspecialchars($p['idtrx']) ?> - Driver Masuk', '<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($p['idtrx']) ?>&nopol=<?= urlencode($p['nopol'] ?? '') ?>&label=IN_DRIVER&path=<?= urlencode($p['foto_masuk2'] ?? '') ?>&time=<?= urlencode($p['waktuMasuk']) ?>')">
+                                                        <img src="<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($p['idtrx']) ?>&nopol=<?= urlencode($p['nopol'] ?? '') ?>&label=IN_DRIVER&path=<?= urlencode($p['foto_masuk2'] ?? '') ?>&time=<?= urlencode($p['waktuMasuk']) ?>" alt="Driver Masuk" class="img-fluid" style="height: 85px; width: 100%; object-fit: cover;">
+                                                        <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-75 text-white small" style="font-size: 0.65rem;">Wajah Driver</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- SISI KELUAR (GATE OUT) -->
+                                        <div class="col-6">
+                                            <div class="small fw-bold text-danger mb-1 text-uppercase" style="font-size: 0.75rem;">
+                                                <i class="fa-solid fa-right-from-bracket me-1"></i> Saat Keluar (<?= htmlspecialchars($p['gateout'] ?? 'OUT') ?>)
+                                            </div>
+                                            <div class="small text-muted mb-2" style="font-size: 0.72rem;"><?= htmlspecialchars($p['waktuKeluar'] ?: 'Sedang Parkir') ?></div>
+
+                                            <?php if ($p['status'] === 'S'): ?>
+                                                <div class="row g-1">
+                                                    <div class="col-6">
+                                                        <div class="border rounded overflow-hidden bg-dark position-relative" style="cursor: pointer;" onclick="showZoomModal('<?= htmlspecialchars($p['idtrx']) ?> - Kendaraan Keluar', '<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($p['idtrx']) ?>&nopol=<?= urlencode($p['nopol'] ?? '') ?>&label=OUT_KENDARAAN&path=<?= urlencode($p['foto_out'] ?? '') ?>&time=<?= urlencode($p['waktuKeluar']) ?>')">
+                                                            <img src="<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($p['idtrx']) ?>&nopol=<?= urlencode($p['nopol'] ?? '') ?>&label=OUT_KENDARAAN&path=<?= urlencode($p['foto_out'] ?? '') ?>&time=<?= urlencode($p['waktuKeluar']) ?>" alt="Plat Keluar" class="img-fluid" style="height: 85px; width: 100%; object-fit: cover;">
+                                                            <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-75 text-white small" style="font-size: 0.65rem;">Kendaraan</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="border rounded overflow-hidden bg-dark position-relative" style="cursor: pointer;" onclick="showZoomModal('<?= htmlspecialchars($p['idtrx']) ?> - Driver Keluar', '<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($p['idtrx']) ?>&nopol=<?= urlencode($p['nopol'] ?? '') ?>&label=OUT_DRIVER&path=<?= urlencode($p['foto_out2'] ?? '') ?>&time=<?= urlencode($p['waktuKeluar']) ?>')">
+                                                            <img src="<?= BASE_URL ?>/kamera/foto?idtrx=<?= urlencode($p['idtrx']) ?>&nopol=<?= urlencode($p['nopol'] ?? '') ?>&label=OUT_DRIVER&path=<?= urlencode($p['foto_out2'] ?? '') ?>&time=<?= urlencode($p['waktuKeluar']) ?>" alt="Driver Keluar" class="img-fluid" style="height: 85px; width: 100%; object-fit: cover;">
+                                                            <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-75 text-white small" style="font-size: 0.65rem;">Wajah Driver</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="d-flex flex-column justify-content-center align-items-center py-4 bg-light rounded text-muted">
+                                                    <i class="fa-solid fa-clock-rotate-left mb-1"></i>
+                                                    <span class="small">Belum Selesai Keluar</span>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+<!-- TAB 3: Pembatalan / VOID -->
 <?php else: ?>
     <div class="card card-custom border-danger printable-area">
         <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
@@ -193,7 +314,7 @@
                             <?php foreach ($void_reports as $v): ?>
                                 <tr>
                                     <td><span class="badge bg-light text-dark border font-monospace"><?= htmlspecialchars($v['idtrx']) ?></span></td>
-                                    <td class="fw-bold text-danger"><?= htmlspecialchars($v['nopol']) ?></td>
+                                    <td class="fw-bold text-danger"><?= htmlspecialchars($v['nopol'] ?: '-') ?></td>
                                     <td><?= htmlspecialchars($v['jn_kendaraan']) ?></td>
                                     <td class="small text-muted"><?= htmlspecialchars($v['waktuMasuk']) ?></td>
                                     <td class="small fw-bold text-dark"><?= htmlspecialchars($v['waktubatal']) ?></td>
@@ -208,5 +329,33 @@
         </div>
     </div>
 <?php endif; ?>
+
+<!-- Modal Zoom Foto Lightbox -->
+<div class="modal fade" id="modalZoomFoto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white py-2">
+                <h6 class="modal-title fw-bold" id="zoomModalTitle"><i class="fa-solid fa-camera me-2 text-warning"></i> Inspeksi Foto</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0 text-center bg-black">
+                <img id="zoomModalImage" src="" class="img-fluid w-100" style="max-height: 520px; object-fit: contain;" alt="Zoom Foto">
+            </div>
+            <div class="modal-footer py-2 bg-light d-flex justify-content-between">
+                <span class="small text-muted font-monospace"><i class="fa-solid fa-circle-info me-1"></i> Klik atau gunakan tombol Esc untuk menutup</span>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showZoomModal(title, url) {
+    document.getElementById('zoomModalTitle').innerHTML = '<i class="fa-solid fa-camera me-2 text-warning"></i> ' + title;
+    document.getElementById('zoomModalImage').src = url;
+    const modal = new bootstrap.Modal(document.getElementById('modalZoomFoto'));
+    modal.show();
+}
+</script>
 
 <?php require_once '../app/views/layouts/footer.php'; ?>

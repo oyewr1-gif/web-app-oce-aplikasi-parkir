@@ -4,6 +4,56 @@ Seluruh riwayat penambahan fitur, perubahan skema penanganan data, dan modifikas
 
 ---
 
+## 🚀 Versi 2.3.0 (Modul Manajemen IP Camera & Galeri Audit Foto Transaksi) - 2026-10-08
+
+### 📌 Ringkasan Pembaruan
+Pembaruan ini mengimplementasikan integrasi perangkat keras visual kamera (*CCTV/IP Camera*) dan modul audit komparasi foto transaksi kendaraan berdasarkan analisis tabel `setipcam`, `foto_in`, `foto_out`, dan `view_transaksi_foto`. Fitur ini memungkinkan administrator mengelola kamera gerbang pos parkir, kasir melakukan verifikasi visual foto kendaraan/wajah pengemudi di pos keluar, dan auditor meninjau komparasi foto masuk vs keluar di menu Laporan.
+
+---
+
+### 📷 Fitur-Fitur Baru yang Diimplementasikan
+
+#### 1. Menu Manajemen & Monitoring IP Camera (`/kamera`)
+- **Akses**: Administrator (Tersedia pada group dropdown *Master & User* di sidebar).
+- **Tabel Basis Data**: `setipcam` (4 kamera gerbang: *IN KENDARAAN*, *IN DRIVER*, *OUT KENDARAAN*, *OUT DRIVER*).
+- **Fitur Utama**:
+  - Tinjauan status alamat IP LAN (IPv4), kredensial akses kamera, dan protokol kompresi/encoding (H.264/H.265/MJPEG).
+  - **Uji Koneksi Real-time (*Test Ping / Socket*)**: Pengujian latensi dan status online/offline kamera secara asinkron via AJAX.
+  - **Modal Live Preview Frame**: Uji pengambilan frame snapshot gambar terkini dari IP camera.
+  - **Modal Edit Konfigurasi**: Form interaktif untuk memperbarui konfigurasi parameter kamera.
+  - **Status Direktori Foto**: Deteksi otomatis kesiapan folder arsip foto di `D:/foto`.
+
+#### 2. Serving Endpoint & Smart Visual Fallback (`/kamera/foto`)
+- Endpoint penyaji gambar pintar yang memeriksa ketersediaan file foto fisik di server (`D:/foto/...` atau folder publik).
+- **Smart Fallback Visual**: Jika file fisik tidak tersedia di disk (misal saat mode pengembangan/offline tanpa kamera fisik terpasang), endpoint secara otomatis menghasilkan gambar SVG dinamis ber-watermark No. Tiket, Plat Nomor, Gate, dan Timestamp OSD sehingga antarmuka tetap bersih tanpa gambar rusak (*no broken image*).
+
+#### 3. Mini Snapshot Thumbnails pada Kasir Keluar (`/parkir/keluar`)
+- Pada panel kiri *Data Tiket & Kendaraan*, ditampilkan 2 thumbnail mini snapshot saat kendaraan masuk (*Foto Kendaraan / Plat* dan *Foto Wajah Driver*).
+- **Lightbox Zoom Modal**: Kasir dapat mengklik foto untuk memperbesar tampilan resolusi tinggi guna memverifikasi kecocokan kendaraan fisik yang mengantre di pos keluar.
+- Tetap mempertahankan prinsip **layout kompak 1 halaman tanpa scroll vertikal**.
+
+#### 4. Tab 'Audit Foto Kendaraan' di Menu Laporan (`/laporan?tab=foto`)
+- Tab ke-3 di halaman Laporan (berdampingan dengan *Jurnal Transaksi* dan *Riwayat Pembatalan VOID*).
+- Menampilkan galeri komparatif berdampingan: **Foto Saat Masuk vs Foto Saat Keluar** per transaksi.
+- Dilengkapi filter pencarian tiket/nopol, rentang tanggal, indikator status lunas/parkir/void, serta modal zoom perbandingan foto.
+
+---
+
+### 📂 Berkas yang Ditambahkan & Dimodifikasi
+- `app/models/KameraModel.php` *(Baru)*
+- `app/controllers/KameraController.php` *(Baru)*
+- `app/views/kamera/index.php` *(Baru)*
+- [`app/views/layouts/header.php`](file:///d:/Data/dev/web/aplikasi-parkir/app/views/layouts/header.php)
+- [`app/controllers/ParkirController.php`](file:///d:/Data/dev/web/aplikasi-parkir/app/controllers/ParkirController.php)
+- [`app/views/parkir/keluar.php`](file:///d:/Data/dev/web/aplikasi-parkir/app/views/parkir/keluar.php)
+- [`app/controllers/LaporanController.php`](file:///d:/Data/dev/web/aplikasi-parkir/app/controllers/LaporanController.php)
+- [`app/views/laporan/index.php`](file:///d:/Data/dev/web/aplikasi-parkir/app/views/laporan/index.php)
+- [`docs/CHANGELOG.md`](file:///d:/Data/dev/web/aplikasi-parkir/docs/CHANGELOG.md)
+- [`docs/DATABASE.md`](file:///d:/Data/dev/web/aplikasi-parkir/docs/DATABASE.md)
+- [`docs/USER_GUIDE.md`](file:///d:/Data/dev/web/aplikasi-parkir/docs/USER_GUIDE.md)
+
+---
+
 ## 🚀 Versi 2.2.0 (Penyederhanaan Tampilan Kasir Keluar 1 Halaman & Fast Checkout) - 2026-10-08
 
 ### 📌 Ringkasan Pembaruan

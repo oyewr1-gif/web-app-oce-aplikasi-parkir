@@ -123,3 +123,32 @@ Modul Administrator untuk mengatur seluruh variabel perhitungan biaya:
 ## 👥 6. Pengelolaan Member & User
 - **Member Parkir (`/member`)**: Mendaftarkan kendaraan langganan berdasarkan plat nomor dan masa berlaku.
 - **Kelola User / Kasir (`/user`)**: Menambah akun petugas, mengatur hak akses, reset password, dan memantau riwayat aktivitas login/logout petugas.
+
+---
+
+## 📷 7. Manajemen & Monitoring IP Camera (`/kamera`)
+Modul Administrator untuk mengelola dan memantau konektivitas kamera snapshot di gerbang parkir:
+
+1. Buka menu **IP Camera Gate** pada dropdown *Master & User* di sidebar.
+2. Halaman menampilkan 4 kamera snapshot gerbang:
+   - **IN KENDARAAN**: Kamera pengambilan foto plat/kendaraan gerbang masuk.
+   - **IN DRIVER**: Kamera pengambilan foto wajah pengemudi gerbang masuk.
+   - **OUT KENDARAAN**: Kamera pengambilan foto plat/kendaraan gerbang keluar.
+   - **OUT DRIVER**: Kamera pengambilan foto wajah pengemudi gerbang keluar.
+3. **Uji Konektivitas Jaringan**:
+   - Klik tombol **Uji Ping** pada kartu kamera untuk memeriksa apakah perangkat kamera dalam status ONLINE atau OFFLINE di jaringan LAN.
+4. **Live Preview Frame**:
+   - Klik tombol **Frame** untuk melihat pratinjau snapshot kamera.
+5. **Edit Pengaturan Kamera**:
+   - Klik **Edit Pengaturan** untuk mengubah IP Address LAN, username, password, dan protokol encoding kamera.
+
+---
+
+## 🔍 8. Galeri Audit Foto CCTV Kendaraan (`/laporan?tab=foto`)
+Modul investigasi dan audit visual transaksi kendaraan:
+
+1. Buka menu **Laporan & Audit Void** $\rightarrow$ pilih tab **Audit Foto Kendaraan**.
+2. Sistem menampilkan galeri komparatif per transaksi:
+   - **Sisi Kiri**: Foto snapshot saat kendaraan masuk (Plat Kendaraan & Wajah Driver).
+   - **Sisi Kanan**: Foto snapshot saat kendaraan keluar (Plat Kendaraan & Wajah Driver).
+3. Klik pada foto mana pun untuk memperbesar (*lightbox zoom*) guna memverifikasi kecocokan kendaraan dan mencegah penipuan tiket tertukar atau pencurian kendaraan.

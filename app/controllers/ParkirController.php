@@ -85,6 +85,9 @@ class ParkirController extends Controller {
                     $calc['is_member'] = true;
                     $calc['member_name'] = $memberInfo['nama'];
                 }
+                // Ambil foto snapshot masuk
+                $kameraModel = $this->model('KameraModel');
+                $photos = $kameraModel->getPhotoByTrx($trx['idtrx']);
             } else {
                 Session::setFlash('Transaksi parkir aktif tidak ditemukan untuk tiket/nopol: ' . htmlspecialchars($keyword), 'danger');
             }
@@ -95,6 +98,7 @@ class ParkirController extends Controller {
             'keyword' => $keyword,
             'trx' => $trx,
             'calc' => $calc,
+            'photos' => $photos,
             'pos_list' => $parkirModel->getPosKasirGates(),
             'active_list' => $parkirModel->getActiveVehicles(15)
         ];

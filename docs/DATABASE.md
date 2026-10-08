@@ -116,6 +116,30 @@ Sistem mendukung multi-skema tarif yang dikelola terpusat di menu **Master Tarif
 7. **`discount_tarif`**: Kode kupon voucher/promo potongan harga (`kode_trx`, `nama`, `nilai`, `status_aktif`).
 8. **`hari_libur`**: Kalender tanggal libur nasional (`tgl`) untuk pemicu tarif libur.
 
+### 6. Tabel & View Modul Kamera & Snapshot Foto
+Mengelola integrasi perangkat keras kamera IP dan pencatatan snapshot visual kendaraan:
+
+1. **`setipcam`** (Master IP Camera):
+   - `id`: Primary key.
+   - `nama`: Posisi/Label Kamera (`IN KENDARAAN`, `IN DRIVER`, `OUT KENDARAAN`, `OUT DRIVER`).
+   - `lanip`: Alamat IPv4 lokal kamera (misal `192.168.1.144`).
+   - `user`, `pass`: Kredensial autentikasi RTSP/HTTP kamera.
+   - `encode`: Protokol kompresi stream video/frame (`H.264`, `H.265`, `MJPEG`).
+
+2. **`foto_in`** (Snapshot Kendaraan Masuk):
+   - `idtrx`: Foreign key ke `jurnal_transaksi.idtrx`.
+   - `foto_masuk1`: Jalur file gambar snapshot plat/kendaraan saat masuk.
+   - `foto_masuk2`: Jalur file gambar snapshot pengemudi saat masuk.
+   - `gate`, `tgl_masuk`, `jam_masuk`, `nopol`, `jenisKendaraan`.
+
+3. **`foto_out`** (Snapshot Kendaraan Keluar):
+   - `idtrx`: Foreign key ke `jurnal_transaksi.idtrx`.
+   - `foto_out`: Jalur file gambar snapshot plat/kendaraan saat keluar.
+   - `foto_out2`: Jalur file gambar snapshot pengemudi saat keluar.
+
+4. **`view_transaksi_foto`** (View Komparasi Visual Terpadu):
+   - Menghubungkan `jurnal_transaksi` dengan `foto_out`, `foto_entry`, dan `foto_lost` untuk komparasi langsung gambar masuk vs keluar.
+
 ---
 
 ## 🧮 Formula Perhitungan Tarif Parkir
