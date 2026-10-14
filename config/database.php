@@ -67,4 +67,4 @@ if (!empty($envBaseUrl)) {
     define('BASE_URL', rtrim($protocol . '://' . $host . $scriptDir, '/'));
 }
 
-define('APP_NAME', env('APP_NAME', 'Sistem Manajemen Parkir MVC'));
+define('APP_NAME', env('APP_NAME', 'SmartPark Pro'));

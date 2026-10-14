@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - <?= APP_NAME ?></title>
+    <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/images/smartpark-icon.svg">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
@@ -30,9 +31,9 @@
             overflow: hidden;
         }
         .login-header {
-            background: #2563eb;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
             color: white;
-            padding: 30px 24px;
+            padding: 28px 24px;
             text-align: center;
         }
         .login-body {
@@ -62,9 +63,14 @@
 
 <div class="login-card">
     <div class="login-header">
-        <i class="fa-solid fa-square-parking fa-3x mb-2"></i>
-        <h4 class="fw-bold mb-1">Aplikasi Parkir MVC</h4>
-        <p class="mb-0 text-white-50 small">Silakan login untuk masuk ke dalam sistem</p>
+        <div class="d-flex justify-content-center align-items-center mb-2">
+            <img src="<?= BASE_URL ?>/images/smartpark-icon.svg" alt="SmartPark" width="46" height="46" class="me-2 shadow-sm rounded-3">
+            <div class="text-start">
+                <h3 class="fw-bold mb-0 text-white" style="letter-spacing: -0.5px;">Smart<span style="color: #38bdf8;">Park</span> <span class="badge bg-white text-primary" style="font-size: 0.65rem; vertical-align: middle;">PRO</span></h3>
+                <small class="text-white-50" style="font-size: 0.72rem; letter-spacing: 0.5px; text-transform: uppercase;">Management System</small>
+            </div>
+        </div>
+        <p class="mb-0 text-white-50 small mt-2">Silakan login untuk masuk ke dalam sistem</p>
     </div>
     <div class="login-body">
         <?php Session::flash(); ?>

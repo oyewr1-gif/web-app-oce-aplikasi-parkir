@@ -1,7 +1,12 @@
+<p align="center">
+  <img src="images/smartpark-logo.jpg" alt="Logo SmartPark Pro" width="360">
+</p>
+
 # LEMBAR SPESIFIKASI FITUR SISTEM
 # SmartPark Pro — Sistem Manajemen Parkir Terpadu & Kasir POS
 
-> **Lembar Ringkasan Fitur & Kapabilitas Sistem Operasional Parkir Otomatis (Pure PHP MVC & MySQL).**
+> **Dokumen Resmi Ringkasan Fitur, Kapabilitas Operasional, & Kebutuhan Perangkat Keras (Hardware).**  
+> **Aplikasi: SmartPark Pro &bull; Kategori: Sistem Manajemen Parkir &amp; POS Kasir Terpadu &bull; Versi: 2.3.0**
 
 ---
 
@@ -101,7 +106,7 @@
   - *Administrator* (Akses penuh seluruh master data, tarif, kamera, laporan, dan user)
   - *Supervisor* (Akses monitoring, verifikasi setoran shift, dan audit void)
   - *Kasir / Operator* (Akses khusus transaksi masuk dan kasir keluar)
-- [x] **Enkripsi Sandi Keamanan**: Pengamanan kata sandi menggunakan hashing modern BCRYPT.
+- [x] **Enkripsi Sandi Keamanan**: Pengamanan kata sandi akun pengguna dengan standar enkripsi modern tingkat tinggi.
 - [x] **Audit Riwayat Login**: Pencatatan riwayat sesi login petugas, waktu masuk, dan pos gardu kerja.
 
 ---
@@ -115,16 +120,39 @@
 
 ---
 
-## 💻 11. Spesifikasi Teknis & Persyaratan Sistem
-- [x] **Bahasa Pemrograman**: PHP 7.4 / PHP 8.x (Pure Native Object-Oriented MVC).
-- [x] **Database Engine**: MySQL / MariaDB (InnoDB, Prepared Statements PDO).
-- [x] **Desain Antarmuka**: HTML5, Bootstrap 5, FontAwesome 6 Icons, Google Fonts Inter (Responsif & Modern).
-- [x] **Arsitektur Jaringan**: *Offline-First* di Jaringan Lokal LAN (Bekerja normal 100% tanpa internet).
-- [x] **Dukungan Perangkat Keras**:
-  - Printer Thermal Kasir (58mm / 80mm ESC/POS)
-  - Barcode Scanner (1D / 2D QR Code USB)
-  - IP Camera CCTV (Protokol ONVIF / RTSP / HTTP Snapshot)
-  - Mesin Dispenser Tiket & Barrier Gate Otomatis
+## 💻 11. Kebutuhan Perangkat Keras (Hardware Minimum) & Lingkungan Operasional
+
+### A. Komputer Server / PC Induk (Administrator & Pusat Data)
+- [x] **Prosesor**: Minimal Intel Core i3 (Generasi ke-4+) atau AMD Ryzen 3 (Rekomendasi Core i5 untuk lokasi dengan traffic padat >1.000 kendaraan/hari).
+- [x] **Memori (RAM)**: Minimal 4 GB (Rekomendasi 8 GB).
+- [x] **Media Penyimpanan**: SSD minimal 128 GB (Rekomendasi SSD 256 GB untuk menampung arsip foto snapshot CCTV jangka panjang).
+- [x] **Antarmuka Jaringan**: Port LAN Gigabit Ethernet (RJ-45 100/1000 Mbps).
+- [x] **Sistem Operasi**: Windows 10 / Windows 11 (64-bit) atau Linux Server (Ubuntu / Debian).
+- [x] **Daya Cadangan**: UPS (*Uninterruptible Power Supply*) minimal 600 VA untuk proteksi pemadaman listrik mendadak.
+
+### B. Komputer Pos Kasir Keluar (Gate OUT)
+- [x] **Prosesor**: Minimal Intel Celeron / Intel Dual Core / Core i3 (Mendukung PC standar maupun Mini PC hemat daya).
+- [x] **Memori (RAM)**: Minimal 2 GB (Rekomendasi 4 GB).
+- [x] **Media Penyimpanan**: SSD minimal 64 GB / 128 GB.
+- [x] **Monitor / Layar**: Resolusi layar minimal 1366 × 768 (Rekomendasi 1920 × 1080 Full HD untuk kenyamanan operasional kasir tanpa scroll).
+- [x] **Port Konektivitas (I/O)**: Minimal 3 port USB aktif (untuk Barcode Scanner, Printer Thermal Struk, dan Keyboard/Mouse).
+- [x] **Sistem Operasi**: Windows 7 / Windows 8.1 / Windows 10 / Windows 11.
+
+### C. Perangkat Periferal & Lapangan
+- [x] **Printer Thermal Kasir**: Printer struk thermal ukuran 58mm atau 80mm dengan antarmuka USB / LAN (Mendukung perintah standar ESC/POS dan pemotong otomatis/auto-cutter).
+- [x] **Barcode Scanner**: Scanner barcode 1D atau 2D QR-Code (Model USB Handheld atau Omnidirectional Handsfree Auto-Sense).
+- [x] **Kamera Pengawas (IP Camera CCTV)**: IP Camera resolusi minimal 2 Megapixel (Full HD 1080p) yang mendukung protokol RTSP / ONVIF / HTTP JPEG Snapshot untuk penangkapan visual plat nomor dan wajah pengemudi.
+- [x] **Barrier Gate & Dispenser Karcis (Opsional / Integrasi)**: Kompatibel dengan Barrier Gate palang otomatis, sensor loop detector kendaraan, dan mesin tiket dispenser manless.
+
+### D. Infrastruktur & Topologi Jaringan
+- [x] **Operasional Mandiri (*Offline-First*)**: Sistem bekerja 100% pada jaringan lokal (LAN) tanpa wajib koneksi internet publik.
+- [x] **Operasional Daring (*Online*)**: Sistem bekerja 100% pada jaringan internet, dan bia diakses dari internet.
+- [x] **Switch / Hub Jaringan**: Switch Hub 10/100/1000 Mbps untuk distribusi kabel ke pos kasir, server, dan IP camera.
+- [x] **Kabel Jaringan**: Kabel UTP standar Cat5e atau Cat6 dengan konektor RJ-45 terpasang rapi.
+
+### E. Infrastruktur Jaringan Internet (Opsional)
+- [x] **Untuk dapat diakses dari internet dibutuhkan ip public jika server mandiri.
+- [x] **Atau sewa hosting jika tanpa server mandiri.
 
 ---
-*SmartPark Pro — Lembar Spesifikasi Fitur Resmi.*
+*SmartPark Pro — Lembar Spesifikasi Fitur & Kebutuhan Hardware Resmi.*

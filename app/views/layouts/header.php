@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($title) ? htmlspecialchars($title) . ' - ' . APP_NAME : APP_NAME ?></title>
+    <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/images/smartpark-icon.svg">
     <!-- Google Fonts Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,9 +21,17 @@
 <div id="wrapper">
     <!-- Sidebar -->
     <div id="sidebar-wrapper">
-        <div class="sidebar-heading">
-            <i class="fa-solid fa-square-parking text-primary fs-3"></i>
-            <span>PARKIR MVC</span>
+        <div class="sidebar-heading py-3 px-3">
+            <a href="<?= BASE_URL ?>/dashboard" class="text-decoration-none d-flex align-items-center gap-2">
+                <img src="<?= BASE_URL ?>/images/smartpark-icon.svg" alt="SmartPark" width="36" height="36" class="rounded-2 shadow-sm flex-shrink-0">
+                <div class="d-flex flex-column text-start">
+                    <span class="fw-bold text-white fs-5 lh-1" style="letter-spacing: -0.3px;">
+                        Smart<span style="color: #38bdf8;">Park</span> 
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.58rem; vertical-align: middle; padding: 2px 4px;">PRO</span>
+                    </span>
+                    <span class="text-white-50 mt-1" style="font-size: 0.62rem; letter-spacing: 0.8px; font-weight: 600;">PARKING SYSTEM</span>
+                </div>
+            </a>
         </div>
         <div class="list-group list-group-flush mt-3">
             <a href="<?= BASE_URL ?>/dashboard" class="list-group-item <?= (strpos($_SERVER['REQUEST_URI'], 'dashboard') !== false || $_SERVER['REQUEST_URI'] == '/') ? 'active' : '' ?>">
@@ -104,9 +113,14 @@
         <!-- Top Navbar -->
         <nav class="navbar navbar-expand-lg navbar-top">
             <div class="container-fluid">
-                <span class="navbar-brand mb-0 h1 fw-semibold text-secondary fs-6">
-                    <i class="fa-regular fa-clock me-1"></i> <?= date('l, d F Y') ?>
-                </span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-bold fs-6">
+                        <i class="fa-solid fa-square-parking me-1"></i> SmartPark Pro
+                    </span>
+                    <span class="text-secondary small d-none d-md-inline ms-2">
+                        <i class="fa-regular fa-clock me-1"></i> <?= date('l, d F Y') ?>
+                    </span>
+                </div>
                 <div class="d-flex align-items-center gap-3">
                     <div class="user-badge">
                         <i class="fa-solid fa-user-circle me-1 text-primary"></i>

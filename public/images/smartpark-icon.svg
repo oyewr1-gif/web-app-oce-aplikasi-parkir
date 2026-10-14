@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="spGradBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="40%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="spGradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="spGradCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <filter id="spDropShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Base Container -->
+  <rect x="6" y="6" width="88" height="88" rx="24" fill="url(#spGradBg)" filter="url(#spDropShadow)" />
+
+  <!-- Subtle Inner Border Highlight -->
+  <rect x="7" y="7" width="86" height="86" rx="23" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.2" />
+
+  <!-- High-Tech Parking 'P' Symbol -->
+  <!-- Vertical Pillar -->
+  <rect x="26" y="24" width="12" height="52" rx="6" fill="#ffffff" />
+
+  <!-- 'P' Loop -->
+  <path d="M38 24 H56 C67.5 24 76 32 76 42.5 C76 53 67.5 61 56 61 H38 V49 H55 C60.5 49 64 46 64 42.5 C64 39 60.5 36 55 36 H38 Z" fill="#ffffff" />
+
+  <!-- Smart IoT Radar Pulse / Signal Waves -->
+  <path d="M67 21 C76 26.5 82 35 83.5 45" fill="none" stroke="url(#spGradGreen)" stroke-width="4.5" stroke-linecap="round" />
+  <path d="M76 15 C87.5 22.5 94.5 33.5 96 46" fill="none" stroke="url(#spGradCyan)" stroke-width="3.5" stroke-linecap="round" opacity="0.85" />
+
+  <!-- Smart Connectivity Node / Pulse Dot -->
+  <circle cx="70" cy="70" r="9" fill="url(#spGradGreen)" stroke="#ffffff" stroke-width="2.5" />
+  <!-- Inner Sensor Pulse -->
+  <circle cx="70" cy="70" r="3.5" fill="#ffffff" />
+</svg>

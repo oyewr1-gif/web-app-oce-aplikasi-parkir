@@ -10,7 +10,7 @@ Selamat datang di pusat dokumentasi resmi **Aplikasi Manajemen Parkir PHP MVC**.
    - Brosur Penawaran Resmi & Product Overview Komersial untuk Klien/Pengelola Parkir (Nilai Tambah Bisnis, 8 Fitur Unggulan, Alur Operasional, Pilihan Paket Admin vs Kasir, & Spesifikasi Hardware).
 
 2. **[Lembar Spesifikasi Fitur Sistem (RINGKASAN_FITUR.md)](RINGKASAN_FITUR.md)**
-   - Cheatsheet & Checklist Fitur Teknis 11 Modul Operasional (Gate IN, Fast Checkout Gate OUT, Multi-Payment, 4-Angle IP Camera CCTV, Karcis Hilang, Shift Kasir, Tarif Progresif & Diskon, Member, User Multi-Level, Pelaporan & Spesifikasi Teknis).
+   - Cheatsheet & Checklist Fitur Operasional 11 Modul (Gate IN, Fast Checkout Gate OUT, Multi-Payment, 4-Angle IP Camera CCTV, Karcis Hilang, Shift Kasir, Tarif Progresif & Diskon, Member, User Multi-Level, Pelaporan & Kebutuhan Hardware Minimum).
 
 3. **[Dokumentasi Walkthrough Lengkap (WALKTHROUGH.md)](WALKTHROUGH.md)**
    - Rangkuman Pengembangan, Fitur Awal, Penanganan Kendala Teknis, & Panduan Deployment XAMPP.

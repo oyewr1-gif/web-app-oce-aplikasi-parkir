@@ -2,9 +2,12 @@
 
 <!-- Page Title Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h3 class="fw-bold text-dark mb-0">Dashboard Ringkasan Parkir</h3>
-        <p class="text-muted small mb-0">Status operasional gate parkir dan ringkasan transaksi real-time.</p>
+    <div class="d-flex align-items-center gap-3">
+        <img src="<?= BASE_URL ?>/images/smartpark-icon.svg" alt="SmartPark Logo" width="46" height="46" class="rounded-3 shadow-sm d-none d-sm-block flex-shrink-0">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Dashboard Ringkasan SmartPark Pro</h3>
+            <p class="text-muted small mb-0">Status operasional gate parkir dan ringkasan transaksi real-time.</p>
+        </div>
     </div>
     <div class="d-flex gap-2">
         <a href="<?= BASE_URL ?>/parkir/masuk" class="btn btn-success fw-semibold">

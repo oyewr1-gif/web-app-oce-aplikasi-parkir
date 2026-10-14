@@ -4,6 +4,35 @@ Seluruh riwayat penambahan fitur, perubahan skema penanganan data, dan modifikas
 
 ---
 
+## 🚀 Versi 2.3.0 (Branding SmartPark Pro, Integrasi Logo Vektor SVG, & Favicon) - 2026-10-14
+
+### 📌 Ringkasan Pembaruan
+Pembaruan ini memperbarui identitas visual dan penamaan resmi aplikasi menjadi **SmartPark Pro** (sesuai dokumen penawaran dan spesifikasi fitur), menggantikan penamaan generik "Parkir MVC" pada seluruh sistem, layout dashboard, sidebar navigasi, dan halaman autentikasi/login.
+
+---
+
+### 🎨 Desain Identitas Brand & Pembuatan Logo
+1. **Aset Logo & Grafis Baru**:
+   - `public/images/smartpark-icon.svg`: Ikon vektor resolusi tinggi berbentuk squircle modern dengan inisial 'P', siluet kendaraan, serta gelombang sinyal radar/IoT (hijau zamrud & biru safir) yang juga berfungsi sebagai **Favicon** peramban.
+   - `public/images/smartpark-logo-sidebar.svg`: Logo horizontal vektor khusus untuk sidebar gelap (`#0f172a`), memuat lambang perisai pintar, tipografi *SmartPark*, dan badge *PRO*.
+   - `public/images/smartpark-logo.svg`: Logo horizontal versi latar belakang terang untuk laporan cetak atau dokumen umum.
+   - `public/images/smartpark-logo.jpg`: Master render grafis identitas korporat beresolusi tinggi.
+2. **Layout Sidebar Dashboard** ([`app/views/layouts/header.php`](file:///d:/Data/dev/web/aplikasi-parkir/app/views/layouts/header.php)):
+   - Menggantikan teks statis `<span>PARKIR MVC</span>` dengan komponen logo interaktif `smartpark-logo-sidebar.svg` yang dapat diklik untuk kembali ke dashboard.
+   - Menambahkan tag `<link rel="icon">` mengarah ke `smartpark-icon.svg`.
+3. **Halaman Login** ([`app/views/auth/login.php`](file:///d:/Data/dev/web/aplikasi-parkir/app/views/auth/login.php)):
+   - Mengintegrasikan logo SmartPark Pro pada kartu autentikasi dengan sentuhan gradien biru navy modern.
+4. **Konfigurasi Global**:
+   - Pembaruan konstanta `APP_NAME` menjadi `"SmartPark Pro"` pada berkas [`.env`](file:///d:/Data/dev/web/aplikasi-parkir/.env) dan [`config/database.php`](file:///d:/Data/dev/web/aplikasi-parkir/config/database.php).
+5. **Perbaikan Bug Inisialisasi `$photos` pada Kasir Keluar** ([`app/controllers/ParkirController.php`](file:///d:/Data/dev/web/aplikasi-parkir/app/controllers/ParkirController.php)):
+   - Menambahkan inisialisasi awal variabel `$photos = null;` pada method `keluar()`. Sebelumnya, pemanggilan foto CCTV snapshot masuk hanya terjadi jika variabel `$trx` ditemukan, sehingga saat kasir membuka menu keluar pertama kali (tanpa parameter pencarian), terjadi `Warning: Undefined variable $photos on line 101`. Masalah ini kini telah teratasi sepenuhnya.
+6. **Integrasi Logo & Standardisasi Dokumen Fitur** ([`docs/RINGKASAN_FITUR.md`](file:///d:/Data/dev/web/aplikasi-parkir/docs/RINGKASAN_FITUR.md)):
+   - Menambahkan logo resmi SmartPark Pro dan identitas aplikasi pada bagian header dokumen.
+   - Menyediakan subdirektori aset lokal `docs/images/` untuk memudahkan konversi dokumen ke format Word (`.docx`) maupun PDF secara portabel.
+   - Memperbarui Bab 11 dengan daftar lengkap Kebutuhan Perangkat Keras (Hardware Minimum) untuk Server, Pos Kasir, Periferal, dan Topologi Jaringan.
+
+---
+
 ## 🚀 Versi 2.2.0 (Penyederhanaan Tampilan Kasir Keluar 1 Halaman & Fast Checkout) - 2026-10-08
 
 ### 📌 Ringkasan Pembaruan
